@@ -1,0 +1,123 @@
+// Plattform  Visualize
+https://dbdiagram.io/
+
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table User {
+  user_id integer [primary key, increment] 
+  email text [unique, not null]
+  password_hash text [not null]
+  role role [not null]
+  surname text [not null]
+  name text [not null]
+  adress text
+  area_code text
+  profile_picture bytea
+}
+
+Table Restaurant {
+  restaurant_id interger [primary key, increment]
+  owner_id integer [ref: - User.user_id]
+  restaurant_name text [not null]
+  description text [not null]
+  adress text [not null]
+  area_code text [not null]
+  approved boolean [not null]
+  is_active boolean [not null]
+  customer_notes text
+  min_order_value numeric(6,2) [not null, default: 0]
+  category text 
+}
+
+Table OpenHours {
+  id integer [primary key, increment]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  day weak_day [not null]
+  open_from time [not null]
+  open_till time [not null]
+}
+
+Table Order{
+  order_id integer [primary key, increment]
+  user_id integer [ref: > User.user_id]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  status order_status [not null]
+  created_at timestamp [not null]
+  total_price numeric(6,2) [not null, default: 0]
+}
+
+Table Dish{
+  dish_id integer [primary key, increment]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  name text [not null]
+  description text 
+  price numeric(6,2) [not null]
+  dish_bytea bytea
+  avaliable boolean
+  category_id integer [ref: - Categories.categorie_id]
+}
+
+Table Categories{
+  categorie_id integer [primary key, increment]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  categorie_name text [not null]
+}
+
+Table Ordered_Items{
+  order_id integer [ref: > Order.order_id]
+  dish_id integer [ref: > Dish.dish_id]
+  price numeric(6,2) [not null]
+  quantity integer [not null]
+}
+
+Table Reviews{
+  review_id integer [primary key, increment]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  user_id integer [ref: > User.user_id]
+  created_at timestamp [not null]
+  rating int [note: '1-5']
+  comment text 
+}
+
+Table Voucher{
+  voucher_id integer [primary key, increment]
+  code text [not null]
+  voucher_value numeric(6,2) [not null]
+  voucher_value_is_percentage boolean [not null, default: false]
+  valid_until timestamp [not null]
+}
+
+Table Used_Vouchers{
+  order_id integer [ref: > Order.order_id]
+  review_id integer [ref: > Voucher.voucher_id]
+}
+
+
+
+Enum order_status {
+  PLACED
+  ACCEPTED
+  DECLINED
+  PREPARING
+  READY
+  DISPATCHED
+  DELIVERED
+  CANCELED
+}
+
+Enum weak_day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+Enum role {
+  CUSTOMER
+  OWNER
+  MANAGER
+}
