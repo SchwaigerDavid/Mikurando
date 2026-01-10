@@ -3,11 +3,11 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "34c0e32b-74a2-4eaf-a380-b95ac3058834"
+    "analytics": "d32a424e-16ba-47f7-b58c-ab5e53a9c345"
   },
   "newProjectRoot": "projects",
   "projects": {
-    "mikurando": {
+    "mikurando-angular": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -67,10 +67,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "mikurando:build:production"
+              "buildTarget": "mikurando-angular:build:production"
             },
             "development": {
-              "buildTarget": "mikurando:build:development"
+              "buildTarget": "mikurando-angular:build:development"
             }
           },
           "defaultConfiguration": "development"

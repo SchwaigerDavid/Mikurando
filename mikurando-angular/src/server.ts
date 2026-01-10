@@ -41,7 +41,7 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response:any) =>
+    .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )
     .catch(next);
