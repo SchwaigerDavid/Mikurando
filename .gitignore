@@ -2,3 +2,5 @@
 .idea/inspectionProfiles/Project_Default.xml
 .idea/dataSources.xml
 .idea/data_source_mapping.xml
+mikurando-angular/.env
+.DS_Store
