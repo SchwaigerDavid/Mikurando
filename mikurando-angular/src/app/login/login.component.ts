@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder} from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
 
 // Material Imports
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from './auth.service';
-import {MatSnackBar,MatSnackBarModule} from '@angular/material/snack-bar';
+import { AuthService } from '../shared/auth/auth.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -19,10 +19,10 @@ import {MatSnackBar,MatSnackBarModule} from '@angular/material/snack-bar';
     RouterLink,
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,      // Für den schicken Rahmen
-    MatFormFieldModule, // Für das Material-Design-Layout der Inputs
-    MatInputModule,     // Für das eigentliche Eingabefeld
-    MatButtonModule     // Für den Material-Button
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -33,21 +33,21 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required])
   });
 
-  constructor(private authService: AuthService,private snackBar: MatSnackBar) { }
+  constructor(private authService: AuthService, private snackBar: MatSnackBar, private router: Router) { }
 
   onSubmit() {
     if (this.loginForm.valid) {
       const { username, password } = this.loginForm.value;
       this.authService.login(username!, password!).subscribe({
-        next: data => {
-          this.snackBar.open('Access granted', 'Close', {
-            duration: 5000 // Optional für rotes Design
-          });
+        next: (data) => {
+          this.authService.persistSession(data.token, data.user);
+          this.snackBar.open('Access granted', 'Close', { duration: 1500 });
+          this.router.navigateByUrl('/home');
         },
-        error: (err) => {
-          this.snackBar.open('Something went wrong', 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar'] // Optional für rotes Design
+        error: () => {
+          this.snackBar.open('Invalid username or password', 'Close', {
+            duration: 4000,
+            panelClass: ['error-snackbar']
           });
         }
       });

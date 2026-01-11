@@ -1,5 +1,14 @@
-<nav>
-  <h1>Meine App</h1>
+<nav class="topnav">
+  <div class="brand">Mikurando</div>
+  <div class="links">
+    <a routerLink="/home" *ngIf="isLoggedIn()">Home</a>
+    <a routerLink="/site-manager" *ngIf="isLoggedIn()">Site Manager</a>
+
+    <span class="user" *ngIf="isLoggedIn()">{{ userName() }}</span>
+
+    <a routerLink="/login" *ngIf="!isLoggedIn()">Login</a>
+    <button class="linkbtn" type="button" (click)="logout()" *ngIf="isLoggedIn()">Logout</button>
+  </div>
 </nav>
 
 <router-outlet></router-outlet>
