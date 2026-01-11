@@ -1,0 +1,1134 @@
+openapi: 3.0.1
+info:
+  title: Mikurando
+  description: Mikurando API
+  version: 1.1.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # ENUMS
+    RoleEnum:
+      type: string
+      enum: [CUSTOMER, OWNER, MANAGER]
+    OrderStatusEnum:
+      type: string
+      enum: [PLACED, ACCEPTED, DECLINED, PREPARING, READY, DISPATCHED, DELIVERED, CANCELED]
+    WeekDayEnum:
+      type: string
+      enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+
+    # ENTITIES
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        surname:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        geo_lat:
+          type: number
+          format: float
+        geo_lng:
+          type: number
+          format: float
+        profile_picture_data:
+          type: string
+          format: byte
+      required:
+        - email
+        - surname
+        - name
+        - role
+
+    Restaurant:
+      type: object
+      properties:
+        restaurant_id:
+          type: integer
+        restaurant_name:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        min_order_value:
+          type: number
+        delivery_radius:
+          type: number
+        image_data:
+          type: string
+          format: byte
+        geo_lat:
+          type: number
+        geo_lng:
+          type: number
+        is_active:
+          type: boolean
+        category:
+          type: string
+      required:
+        - restaurant_name
+        - address
+
+    OpenHours:
+      type: object
+      properties:
+        day:
+          $ref: '#/components/schemas/WeekDayEnum'
+        open_from:
+          type: string
+          example: "09:00"
+        open_till:
+          type: string
+          example: "22:00"
+      required:
+        - day
+        - open_from
+        - open_till
+
+    Dish:
+      type: object
+      properties:
+        dish_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        image_data:
+          type: string
+          format: byte
+        available:
+          type: boolean
+        category_id:
+          type: integer
+      required:
+        - name
+        - price
+
+    Voucher:
+      type: object
+      properties:
+        voucher_id:
+          type: integer
+        code:
+          type: string
+        voucher_value:
+          type: number
+        voucher_value_is_percentage:
+          type: boolean
+        valid_until:
+          type: string
+          format: date-time
+      required:
+        - code
+        - voucher_value
+        - valid_until
+
+    Review:
+      type: object
+      properties:
+        review_id:
+          type: integer
+        restaurant_id:
+          type: integer
+        user_name:
+          type: string
+          description: Name of the reviewer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        dish_id:
+          type: integer
+          nullable: true
+
+    Order:
+      type: object
+      properties:
+        order_id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        total_price:
+          type: number
+        service_fee:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        delivery_address:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderedItem'
+        estimated_delivery_time:
+          type: string
+          format: date-time
+
+    OrderedItem:
+      type: object
+      properties:
+        dish_id:
+          type: integer
+        name:
+          type: string
+        quantity:
+          type: integer
+        price_at_order:
+          type: number
+
+    # REQUEST BODIES
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        address:
+          type: string
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+        - email
+        - password
+        - name
+        - surname
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        restaurant_id:
+          type: integer
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              dish_id:
+                type: integer
+              quantity:
+                type: integer
+        voucher_code:
+          type: string
+          nullable: true
+        delivery_address:
+          type: string
+        geo_lat:
+          type: number
+        geo_lng:
+          type: number
+      required:
+        - restaurant_id
+        - items
+        - delivery_address
+
+    CreateReviewRequest:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        dish_id:
+          type: integer
+          nullable: true
+      required:
+        - rating
+
+    CreateVoucherRequest:
+      type: object
+      properties:
+        code:
+          type: string
+        voucher_value:
+          type: number
+        voucher_value_is_percentage:
+          type: boolean
+        valid_until:
+          type: string
+          format: date-time
+      required:
+        - code
+        - voucher_value
+
+    SetOpenHoursRequest:
+      type: object
+      properties:
+        schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpenHours'
+
+paths:
+  # Authentification
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+        '400':
+          description: Validation error
+        '409':
+          description: Conflict - User with this email already exists
+
+  /auth/login:
+    post:
+      summary: Login user and return JWT
+      tags: [Auth]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request (missing email or password)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+        '404':
+          description: User not found (e.g. account deleted)
+
+  # User
+  /user/profile:
+    get:
+      summary: Get current user profile
+      tags: [User]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+        '404':
+          description: User not found (e.g. account deleted)
+    put:
+      summary: Update profile info
+      tags: [User]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Profile updated
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+        '404':
+          description: User not found (e.g. account deleted)
+
+  # Restaurants
+  /restaurants:
+    get:
+      summary: List restaurants with filters
+      description: Returns a list of restaurants matching the query parameters.
+      tags: [Restaurants]
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Partial match for restaurant name
+        - name: area_code
+          in: query
+          schema:
+            type: string
+          description: Filter by zip code
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by restaurant type
+        - name: lat
+          in: query
+          schema:
+            type: number
+          description: User latitude (for distance calculation)
+        - name: lng
+          in: query
+          schema:
+            type: number
+          description: User longitude (for distance calculation)
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/Restaurant'
+                    - type: object
+                      properties:
+                        distance_km:
+                          type: number
+                        estimated_time_min:
+                          type: integer
+        '400':
+          description: Bad Request (Invalid parameters)
+
+  /restaurants/{id}:
+    get:
+      summary: Get restaurant details
+      tags: [Restaurants]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Restaurant'
+                  - type: object
+                    properties:
+                      opening_hours:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OpenHours'
+                      menu_categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            category_id:
+                              type: integer
+                            category_name:
+                              type: string
+                            dishes:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/Dish'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '404':
+          description: Restaurant not found
+
+  /restaurants/{id}/reviews:
+    get:
+      summary: Get reviews for a restaurant
+      tags: [Restaurants]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '404':
+          description: Restaurant not found
+    post:
+      summary: Add a review
+      tags: [Restaurants]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Review created
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+        '404':
+          description: Restaurant not found
+
+  # Orders
+  /orders:
+    post:
+      summary: Place a new order
+      tags: [Orders]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order placed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request (Invalid input, Restaurant closed, Min order value not met, or out of delivery radius)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+
+    get:
+      summary: Get order history for current user
+      tags: [Orders]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned)
+
+  /orders/{id}:
+    get:
+      summary: Get specific order details
+      tags: [Orders]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (Account is banned or Order belongs to another user)
+        '404':
+          description: Order not found
+
+  # Owner
+  /owner/restaurants:
+    get:
+      summary: Get all restaurants owned by the logged-in user
+      description: Returns a list.
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER)
+
+
+    post:
+      summary: Create a new restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurant'
+      responses:
+        '201':
+          description: Restaurant created
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER)
+
+
+  /owner/restaurants/{restaurantId}:
+    put:
+      summary: Update details of a specific restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Restaurant'
+      responses:
+        '200':
+          description: Restaurant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+
+  /owner/restaurants/{restaurantId}/orders:
+    get:
+      summary: Get orders from a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+
+  /owner/restaurants/{restaurantId}/orders/{orderId}/status:
+    patch:
+      summary: Update status of a order in a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/OrderStatusEnum'
+              required: [status]
+      responses:
+        '200':
+          description: Status updated
+        '400':
+          description: Bad Request (Invalid parameters, Forbidden action)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant / Order not Found
+
+  /owner/restaurants/{restaurantId}/opening-hours:
+    put:
+      summary: Update opening hours for a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetOpenHoursRequest'
+      responses:
+        '200':
+          description: Hours updated
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+
+  /owner/restaurants/{restaurantId}/dishes:
+    post:
+      summary: Add a new dish to a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dish'
+      responses:
+        '201':
+          description: Dish created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+
+  /owner/restaurants/{restaurantId}/dishes/{dishId}:
+    put:
+      summary: Update a dish from a resturant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dish'
+      responses:
+        '200':
+          description: Dish updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant / Dish not Found
+    delete:
+      summary: Delete a dish from a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dish deleted
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant / Dish not Found
+
+
+  /owner/restaurants/{restaurantId}/categories:
+    get:
+      summary: Get categories of a restaurant
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category_id:
+                      type: integer
+                    category_name:
+                      type: string
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+    post:
+      summary: Create a new menu category
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_name:
+                  type: string
+              required: [category_name]
+      responses:
+        '201':
+          description: Category created
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant not Found
+
+  /owner/restaurants/{restaurantId}/categories/{categoryId}:
+    delete:
+      summary: Delete a category
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Category deleted
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
+        '404':
+          description: Restaurant / Category not Found
+
+  # Site Manager
+  /admin/restaurants/pending:
+    get:
+      summary: Get restaurants waiting for approval
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+
+
+  /admin/restaurants/{id}/approve:
+    post:
+      summary: Approve or Reject a restaurant
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved:
+                  type: boolean
+      responses:
+        '200':
+          description: Action processed
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+        '404':
+          description: Restaurant not Found
+
+  /admin/users:
+    get:
+      summary: List all users
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+        '404':
+          description: Restaurant not Found
+
+
+  /admin/users/{userId}/ban:
+    patch:
+      summary: Ban or Unban a user
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_banned:
+                  type: boolean
+      responses:
+        '200':
+          description: User status updated
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+        '404':
+          description: User not Found
+
+  /admin/vouchers:
+    get:
+      summary: List all active vouchers
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Voucher'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+    post:
+      summary: Create a new voucher
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVoucherRequest'
+      responses:
+        '201':
+          description: Voucher created
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+
+  /admin/vouchers/{voucherId}:
+    delete:
+      summary: Delete a voucher
+      tags: [Admin]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: voucherId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voucher deleted successfully
+        '400':
+          description: Bad Request (Invalid parameters, Cannot delete voucher)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not a MANAGER)
+        '404':
+          description: Voucher not found
