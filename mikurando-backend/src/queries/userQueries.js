@@ -10,8 +10,15 @@ const registerUser =
 
 const checkEmailExists = 'SELECT user_id FROM "User" WHERE email = $1';
 
+const getUserByEmail =`
+    SELECT 
+        * 
+    FROM "User"
+    WHERE email = $1
+`
 
 module.exports = {
     registerUser,
-    checkEmailExists
+    checkEmailExists,
+    getUserByEmail
 }

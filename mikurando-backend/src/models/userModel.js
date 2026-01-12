@@ -2,7 +2,7 @@ const db = require('../database/db');
 const queries = require('../queries/userQueries');
 
 
-const getUserByEmail = async (email) => {
+const getUserIdByEmail = async (email) => {
     const result = await db.query(queries.checkEmailExists, [email]);
     return result.rows[0];
 };
@@ -17,7 +17,13 @@ const createUser = async (userData) => {
     return result.rows[0];
 }
 
+const getUserByEmail = async (email) => {
+    const result = await db.query(queries.getUserByEmail, [email]);
+    return result.rows[0];
+}
+
 module.exports = {
-    getUserByEmail,
-    createUser
+    getUserIdByEmail,
+    createUser,
+    getUserByEmail
 };

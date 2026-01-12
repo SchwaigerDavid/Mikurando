@@ -347,11 +347,9 @@ paths:
         '400':
           description: Bad Request (missing email or password)
         '401':
-          description: Unauthorized (Invalid or missing token)
+          description: Unauthorized (Invalid Email Password combination)
         '403':
           description: Forbidden (Account is banned)
-        '404':
-          description: User not found (e.g. account deleted)
 
   # User
   /user/profile:

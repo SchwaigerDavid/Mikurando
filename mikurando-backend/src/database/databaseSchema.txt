@@ -1,5 +1,5 @@
 // Plattform  Visualize
-https://dbdiagram.io/
+// https://dbdiagram.io/
 
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
@@ -16,6 +16,7 @@ Table User {
   profile_picture bytea
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
+  is_active boolean [not null, default: true]
 }
 
 Table Restaurant {

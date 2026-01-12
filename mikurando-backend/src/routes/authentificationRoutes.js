@@ -14,6 +14,10 @@ router.post('/register',
     authentificationController.register // register User
 );
 
+router.post('/login',
+    validationMiddleware.validateLogin,
+    authentificationController.login
+)
 
 // Exports
 module.exports = router;

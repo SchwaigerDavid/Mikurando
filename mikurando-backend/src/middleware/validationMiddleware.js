@@ -12,6 +12,16 @@ const validateRegistration = (req, res, next) => {
     next(); // hand request over to next middleware / next controller
 };
 
+const validateLogin = (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password || !password.length) {
+        return res.status(400).json({error: 'Please fill out all mandatory fields.'});
+    }
+
+    next();
+}
+
 module.exports = {
-    validateRegistration
+    validateRegistration,
+    validateLogin
 };

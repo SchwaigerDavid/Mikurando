@@ -36,7 +36,8 @@ CREATE TABLE "User" (
   "area_code" text,
   "profile_picture" bytea,
   "geo_lat" numeric(9,6),
-  "geo_lng" numeric(9,6)
+  "geo_lng" numeric(9,6),
+  "is_active" boolean NOT NULL DEFAULT true
 );
 
 CREATE TABLE "Restaurant" (
