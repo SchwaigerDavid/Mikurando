@@ -4,3 +4,4 @@
 .idea/data_source_mapping.xml
 mikurando-angular/.env
 .DS_Store
+mikurando-backend/.env
