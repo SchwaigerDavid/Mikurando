@@ -71,7 +71,7 @@ CREATE TABLE "Order" (
   "status" order_status NOT NULL,
   "created_at" timestamp NOT NULL,
   "total_price" numeric(8,2) NOT NULL DEFAULT 0,
-  "service_fee" numeric(8,2)
+  "service_fee" numeric(8,2),
   "delivery_address" text NOT NULL,
   "delivery_lat" numeric(9,6),
   "delivery_lng" numeric(9,6)
