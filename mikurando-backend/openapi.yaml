@@ -649,6 +649,33 @@ paths:
 
 
   /owner/restaurants/{restaurantId}:
+    get:
+      summary: Get details of a restaurantowned by the logged-in user
+      tags: [Owner]
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Bad Request (Invalid parameters)
+        '401':
+          description: Unauthorized (Invalid or missing token)
+        '403':
+          description: Forbidden (User is not an OWNER)
+        '418':
+          description : I'm a Teapot (When the User's Restaurant name includes "coffee", there is (1-10%) chance that he gets 418 response when visiting the homepage of his restaurant)
+
+
     put:
       summary: Update details of a specific restaurant
       tags: [Owner]
