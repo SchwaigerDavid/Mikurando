@@ -4,6 +4,7 @@ const cors = require('cors');
 
 
 const authentificationRoutes = require('./src/routes/authentificationRoutes');
+const restaurantRoutes = require('./src/routes/restaurantRoutes');
 
 const app = express();  // Create Express Application
 
@@ -12,6 +13,7 @@ app.use(express.json()); // Allow JSON bodies in requests -> look at API spec
 
 
 app.use('/auth', authentificationRoutes); // Registers Authentification Routes
+app.use('/restaurant', restaurantRoutes);
 
 
 

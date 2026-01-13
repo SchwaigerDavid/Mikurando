@@ -34,6 +34,7 @@ Table Restaurant {
   category text
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
+  restaurant_image
 }
 
 Table OpenHours {
