@@ -52,6 +52,18 @@ const getRestaurantDetailsById = `
     WHERE r.restaurant_id = $1;
 `;
 
+
+const getRestaurantReviews = `
+    SELECT r.review_id, r.restaurant_id, u.surname as username, r.dish_id, r.created_at, r.rating, r.comment
+    FROM "Reviews" r
+    LEFT JOIN "User" u ON r.user_id = u.user_id
+    WHERE r.restaurant_id = $1;
+`;
+
+const getRestaurantNameById = 'SELECT restaurant_name FROM "Restaurant" WHERE restaurant_id = $1';
+
 module.exports = {
-    getRestaurantDetailsById
+    getRestaurantDetailsById,
+    getRestaurantReviews,
+    getRestaurantNameById
 };

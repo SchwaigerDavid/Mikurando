@@ -7,6 +7,18 @@ const getRestaurantDetailsById = async (id) => {
     return result.rows[0];
 }
 
+const getRestaurantReviews = async (id) => {
+    const result = await  db.query(queries.getRestaurantReviews, [id]);
+    return result.rows;
+}
+
+const getRestaurantNameById = async (id) => {
+    const result = await  db.query(queries.getRestaurantNameById, [id]);
+    return result.rows[0];
+}
+
 module.exports = {
-    getRestaurantDetailsById
+    getRestaurantDetailsById,
+    getRestaurantReviews,
+    getRestaurantNameById
 };

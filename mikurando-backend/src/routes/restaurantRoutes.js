@@ -13,6 +13,10 @@ router.get('/:id',
     restaurantController.getRestaurantDetailsById
 );
 
+router.get('/:id/reviews',
+    requestParameterValidationMiddleware.validateIdParameter,
+    restaurantController.getRestaurantReviews
+);
 
 // Exports
 module.exports = router;
