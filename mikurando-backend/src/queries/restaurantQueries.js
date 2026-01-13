@@ -54,7 +54,7 @@ const getRestaurantDetailsById = `
 
 
 const getRestaurantReviews = `
-    SELECT r.review_id, r.restaurant_id, u.surname as username, d.name as dish_name, r.created_at, r.rating, r.comment
+    SELECT r.review_id, r.restaurant_id, u.name as username, d.name as dish_name, r.created_at, r.rating, r.comment
     FROM "Reviews" r
     LEFT JOIN "User" u ON r.user_id = u.user_id
     LEFT JOIN "Dish" d ON r.dish_id = d.dish_id
@@ -63,8 +63,19 @@ const getRestaurantReviews = `
 
 const getRestaurantNameById = 'SELECT restaurant_name FROM "Restaurant" WHERE restaurant_id = $1';
 
+const addRestaurantReview = `
+    INSERT INTO "Reviews" 
+        (restaurant_id, user_id, dish_id, created_at, rating, comment)
+    VALUES 
+        ($1, $2, $3, $4, $5, $6)
+`
+
+const getDishNameById = 'SELECT name FROM "Dish" WHERE dish_id = $1 AND restaurant_id = $2';
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
-    getRestaurantNameById
+    getRestaurantNameById,
+    addRestaurantReview,
+    getDishNameById
 };

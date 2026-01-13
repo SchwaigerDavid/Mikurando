@@ -17,8 +17,19 @@ const getRestaurantNameById = async (id) => {
     return result.rows[0];
 }
 
+const addRestaurantReview = async (restaurant_id, user_id, dish_id, created_at, rating, comment) => {
+    await db.query(queries.addRestaurantReview, [restaurant_id, user_id, dish_id, created_at, rating, comment]);
+}
+
+const getDishNameById = async (dish_id, restaurant_id) => {
+    const result = await  db.query(queries.getDishNameById, [dish_id, restaurant_id]);
+    return result.rows[0];
+}
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
-    getRestaurantNameById
+    getRestaurantNameById,
+    addRestaurantReview,
+    getDishNameById
 };
