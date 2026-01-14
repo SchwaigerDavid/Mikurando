@@ -13,7 +13,7 @@ export type AuthUser = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiURL = 'https://mikurando-api.de/auth/login';
+  private apiURL = 'http://localhost:3000/auth';
   constructor(private http: HttpClient) {
   }
   private readonly platformId = inject(PLATFORM_ID);
@@ -55,14 +55,15 @@ export class AuthService {
 
   login(email: string, password: string): Observable<{token: string; user: Record<string, object> }> {
     const loginData = {email, password};
-    return this.http.post<{token: string; user: Record<string, object> }>(this.apiURL, loginData) ;
-  /*
-    if (email === 'admin' && password === 'admin') {
-      return of({ token: 'fake-jwt-token', user: 'Admin' }).pipe(delay(400));
-    }
+    const url = `${this.apiURL}/login`
+    return this.http.post<{token: string; user: Record<string, object> }>(url, loginData) ;
+    /*
+      if (email === 'admin' && password === 'admin') {
+        return of({ token: 'fake-jwt-token', user: 'Admin' }).pipe(delay(400));
+      }
 
-    return throwError(() => new Error('Invalid email or password')).pipe(delay(400));
-    */
+      return throwError(() => new Error('Invalid email or password')).pipe(delay(400));
+      */
   }
 
   persistSession(token: string, user: Record<string, object>) {

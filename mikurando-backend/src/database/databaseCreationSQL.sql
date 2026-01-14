@@ -1,3 +1,7 @@
+CREATE DATABASE "Mikurando";
+
+\c Mikurando;
+
 CREATE TYPE "order_status" AS ENUM (
   'PLACED',
   'ACCEPTED',
@@ -55,7 +59,7 @@ CREATE TABLE "Restaurant" (
   "category" text,
   "geo_lat" numeric(9,6),
   "geo_lng" numeric(9,6),
-  "restaurant_image" bytea,
+  "restaurant_image" bytea
 );
 
 CREATE TABLE "OpenHours" (
