@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { delay, Observable, of, throwError } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -12,6 +13,9 @@ export type AuthUser = {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private apiURL = 'https://mikurando-api.de/auth/login';
+  constructor(private http: HttpClient) {
+  }
   private readonly platformId = inject(PLATFORM_ID);
   private get isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
@@ -21,7 +25,7 @@ export class AuthService {
   private readonly storageKeyUser = 'mikurando_user';
 
   readonly token = signal<string | null>(this.readToken());
-  readonly userName = signal<string>(this.readUserName());
+  readonly email = signal<string>(this.reademail());
 
   readonly user = signal<AuthUser | null>(this.readStructuredUser());
 
@@ -30,7 +34,7 @@ export class AuthService {
     return localStorage.getItem(this.storageKeyToken);
   }
 
-  private readUserName(): string {
+  private reademail(): string {
     if (!this.isBrowser) return '';
     return localStorage.getItem(this.storageKeyUser) ?? '';
   }
@@ -45,26 +49,30 @@ export class AuthService {
     return !!this.token();
   }
 
-  getUserName(): string {
-    return this.userName() || 'admin';
+  getemail(): string {
+    return this.email() || 'admin';
   }
 
-  login(username: string, password: string): Observable<{ token: string; user: string }> {
-    if (username === 'admin' && password === 'admin') {
+  login(email: string, password: string): Observable<{token: string; user: Record<string, object> }> {
+    const loginData = {email, password};
+    return this.http.post<{token: string; user: Record<string, object> }>(this.apiURL, loginData) ;
+  /*
+    if (email === 'admin' && password === 'admin') {
       return of({ token: 'fake-jwt-token', user: 'Admin' }).pipe(delay(400));
     }
 
-    return throwError(() => new Error('Invalid username or password')).pipe(delay(400));
+    return throwError(() => new Error('Invalid email or password')).pipe(delay(400));
+    */
   }
 
-  persistSession(token: string, user: string) {
+  persistSession(token: string, user: Record<string, object>) {
     if (this.isBrowser) {
       localStorage.setItem(this.storageKeyToken, token);
-      localStorage.setItem(this.storageKeyUser, user);
+      localStorage.setItem(this.storageKeyUser, JSON.stringify(user));
     }
 
     this.token.set(token);
-    this.userName.set(user);
+    this.email.set(JSON.stringify(user)); // JSON.parse(this.email);
   }
 
   setSession(token: string, user: AuthUser) {
@@ -75,7 +83,7 @@ export class AuthService {
 
     this.token.set(token);
     this.user.set(user);
-    this.userName.set(user.email);
+    this.email.set(user.email);
   }
 
   logout() {
@@ -86,7 +94,7 @@ export class AuthService {
     }
 
     this.token.set(null);
-    this.userName.set('');
+    this.email.set('');
     this.user.set(null);
   }
 

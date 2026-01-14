@@ -16,7 +16,7 @@ export class App {
   private router = inject(Router);
 
   isLoggedIn = computed(() => this.auth.isLoggedIn());
-  userName = computed(() => this.auth.getUserName());
+  userName = computed(() => this.auth.getemail());
 
   logout() {
     this.auth.logout();
