@@ -51,6 +51,7 @@ Table Order{
   restaurant_id integer [ref: > Restaurant.restaurant_id]
   status order_status [not null]
   created_at timestamp [not null]
+  estimated_delivery_time timestamp
   total_price numeric(8,2) [not null, default: 0]
   service_fee numeric(8,2)
   delivery_address text [not null]

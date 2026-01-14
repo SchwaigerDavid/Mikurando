@@ -72,6 +72,7 @@ CREATE TABLE "Order" (
   "restaurant_id" integer,
   "status" order_status NOT NULL,
   "created_at" timestamp NOT NULL,
+  "estimated_delivery_time" timestamp,
   "total_price" numeric(8,2) NOT NULL DEFAULT 0,
   "service_fee" numeric(8,2),
   "delivery_address" text NOT NULL,
