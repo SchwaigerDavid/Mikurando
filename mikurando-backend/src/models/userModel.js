@@ -27,9 +27,15 @@ const getUserNameById = async (id) => {
     return result.rows[0];
 }
 
+const getUserById = async (id) => {
+    const result = await db.query(queries.getUserById, [id]);
+    return result.rows[0];
+}
+
 module.exports = {
     getUserIdByEmail,
     createUser,
     getUserByEmail,
-    getUserNameById
+    getUserNameById,
+    getUserById
 };
