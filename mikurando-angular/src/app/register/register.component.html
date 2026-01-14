@@ -8,25 +8,39 @@
 <button matButton="elevated" (click)="isLinear = !isLinear" id="toggle-linear">
   {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
 </button>
-<mat-stepper [linear]="isLinear" #stepper>
+<mat-stepper [linear]="isLinear" orientation="vertical" #stepper>
   <mat-step [stepControl]="firstFormGroup">
     <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Fill out your name</ng-template>
+      <ng-template matStepLabel>Fill out your name and email</ng-template>
       <mat-form-field>
         <mat-label>Name</mat-label>
-        <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
+        <input matInput placeholder="First name" formControlName="firstname" required>
+      </mat-form-field>
+      <br>
+      <mat-form-field>
+        <mat-label>Surname </mat-label>
+        <input matInput placeholder="Last name" formControlName="lastname" required>
+      </mat-form-field>
+      <br>
+      <mat-form-field>
+        <mat-label>E Mail</mat-label>
+        <input matInput placeholder="E-Mail" formControlName="email" required>
       </mat-form-field>
       <div>
         <button matButton matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
-  <mat-step [stepControl]="secondFormGroup" label="Fill out your address">
+  <mat-step [stepControl]="secondFormGroup" label="Fill out your address and area code">
     <form [formGroup]="secondFormGroup">
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
-               required>
+        <input matInput formControlName="adress" placeholder="Ex. 1 Main St, New York, NY">
+      </mat-form-field>
+      <br>
+      <mat-form-field>
+        <mat-label>Area code</mat-label>
+        <input matInput formControlName="areaCode" placeholder="9020">
       </mat-form-field>
       <div>
         <button matButton matStepperPrevious>Back</button>
@@ -34,16 +48,61 @@
       </div>
     </form>
   </mat-step>
+  <mat-step [stepControl]="thirdFormGroup" label="Password">
+    <form [formGroup]="thirdFormGroup">
+      <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input matInput [type]= "hide() ? 'password' : 'text'" formControlName="password" placeholder="Password" required>
+      </mat-form-field>
+      <br>
+      <mat-form-field>
+        <mat-label>Confirm Password</mat-label>
+        <input matInput [type]= "hide() ? 'password' : 'text'"  placeholder="Password" required>
+      </mat-form-field>
+      <div>
+        <button matButton matStepperPrevious>Back</button>
+        <button matButton matStepperNext>Next</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="fourthFormGroup" label="Choose a role">
+    <form [formGroup]="fourthFormGroup">
+      <mat-radio-group formControlName="role" aria-label="Roles " required>
+        <br>
+        <mat-radio-button value="1">Customer</mat-radio-button>
+        <br>
+        <mat-radio-button value="2">Owner</mat-radio-button>
+        <br>
+        <mat-radio-button value="3">Cite Manager</mat-radio-button>
+      </mat-radio-group>
+      <div>
+        <button matButton matStepperPrevious>Back</button>
+        <button matButton matStepperNext>Next</button>
+    </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="fithFormGroup" label="Profile Picture">
+    <input type="File" #fileInput style="display: none" (change)="onFileSelected($event)">
+
+    <div class="upload-section">
+      <p>Lade dein Profilbild hoch:</p>
+
+      <button type="button" mat-raised-button color="primary" (click)="fileInput.click()">
+        Datei auswählen
+      </button>
+
+      <span style="margin-left: 10px;">{{ fileName || 'Keine Datei ausgewählt' }}</span>
+    </div>
+  </mat-step>
   <mat-step>
     <ng-template matStepLabel>Done</ng-template>
     <p>You are now done.</p>
+    <button matButton="elevated" (click)="done()">Done</button>
     <div>
       <button matButton matStepperPrevious>Back</button>
       <button matButton (click)="stepper.reset()">Reset</button>
     </div>
   </mat-step>
 </mat-stepper>
-
-
 </body>
 </html>
