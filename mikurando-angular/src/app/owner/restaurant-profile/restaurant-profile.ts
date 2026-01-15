@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
+import { validOpeningHoursValidator } from './opening-hours.validator';
 
 
 @Component({
@@ -37,7 +38,7 @@ export class RestaurantProfile {
         open: new FormControl('09:00'),
         close: new FormControl('22:00'),
         closed: new FormControl(false),
-      })
+      }, { validators: validOpeningHoursValidator() })
     )
   );
 
