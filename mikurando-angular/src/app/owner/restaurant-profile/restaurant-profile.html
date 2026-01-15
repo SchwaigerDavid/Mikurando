@@ -46,11 +46,34 @@
           Speichern
         </button>
 
+        <div formArrayName="openingHours">
+          <div
+            *ngFor="let day of openingHours.controls; let i = index"
+            [formGroupName]="i"
+            class="day-row"
+          >
+            <strong>{{ day.value.day }}</strong>
+
+            <mat-form-field>
+              <input matInput type="time" formControlName="open">
+            </mat-form-field>
+
+            <span>–</span>
+
+            <mat-form-field>
+              <input matInput type="time" formControlName="close">
+            </mat-form-field>
+
+            <mat-checkbox formControlName="closed">
+              geschlossen
+            </mat-checkbox>
+          </div>
+        </div>
+
         <div *ngIf="payload">
           <h3>Payload Preview</h3>
           <pre>{{ payload | json }}</pre>
         </div>
-
 
       </form>
     </mat-card-content>

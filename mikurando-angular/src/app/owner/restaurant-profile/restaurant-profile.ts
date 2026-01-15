@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormArray } from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
@@ -7,6 +8,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {FormGroup, FormControl} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 
@@ -21,11 +23,24 @@ import { MatCardModule } from '@angular/material/card';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatCheckboxModule,
   ],
   templateUrl: './restaurant-profile.html',
   styleUrl: './restaurant-profile.scss',
 })
 export class RestaurantProfile {
+
+  openingHours = new FormArray(
+    ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(day =>
+      new FormGroup({
+        day: new FormControl(day),
+        open: new FormControl('09:00'),
+        close: new FormControl('22:00'),
+        closed: new FormControl(false),
+      })
+    )
+  );
+
   profileForm = new FormGroup({
     name: new FormControl('', Validators.required),
     description: new FormControl('', Validators.required),
@@ -34,7 +49,7 @@ export class RestaurantProfile {
     customer_notes: new FormControl(''),
     min_order_value: new FormControl('', Validators.required),
     category: new FormControl('', Validators.required),
-
+    openingHours: this.openingHours,
   });
 
   get name() {
@@ -74,8 +89,6 @@ export class RestaurantProfile {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
-
-
   payload: any = null;
 
   save() {
@@ -99,7 +112,9 @@ export class RestaurantProfile {
       approved: false,
       is_active: false,
       owner_id: this.owner_id,
-      restaurant_id: this.restaurant_id
+      restaurant_id: this.restaurant_id,
+
+      openingHours: this.profileForm.value.openingHours,
     };
 
     console.log('Payload:', this.payload);
