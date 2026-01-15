@@ -31,7 +31,7 @@ export class RestaurantProfile {
     description: new FormControl('', Validators.required),
     adress: new FormControl('', Validators.required), //name korrekt so
     area_code: new FormControl('', Validators.required),
-    customer_notes: new FormControl('-'),
+    customer_notes: new FormControl(''),
     min_order_value: new FormControl('', Validators.required),
     category: new FormControl('', Validators.required),
 
@@ -65,27 +65,44 @@ export class RestaurantProfile {
     return this.profileForm.get('category');
   }
 
+  get owner_id(){
+    return 123;
+    //get correct owner id by user id when backend is connected
+  }
+
+  get restaurant_id(){
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
 
 
 
-
-  //approved bool
-  //is_active bool
-  //id generieren für restaurant
-  //owner id zuordnen
+  payload: any = null;
 
   save() {
+
+    if(this.profileForm.invalid) return;
+
     console.log('Form value:', this.profileForm.value);
 
-    const payload = {
-      name: this.name,
-      description: this.description,
-      adress: this.adress,
-      customerNotes: this.customerNotes,
-      minorderValue: this.minOrderValue,
-      category: this.category,
-      restaurantID: 0, //get unique id
+    if(this.minOrderValue?.invalid) {
+      this.minOrderValue.setValue('0');
     }
+
+    this.payload = {
+      name: this.name?.value,
+      description: this.description?.value,
+      adress: this.adress?.value,
+      customerNotes: this.customerNotes?.value,
+      minOrderValue: this.minOrderValue?.value,
+      category: this.category?.value,
+
+      approved: false,
+      is_active: false,
+      owner_id: this.owner_id,
+      restaurant_id: this.restaurant_id
+    };
+
+    console.log('Payload:', this.payload);
   }
 }
 

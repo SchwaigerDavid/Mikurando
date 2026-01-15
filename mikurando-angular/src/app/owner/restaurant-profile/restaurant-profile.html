@@ -42,9 +42,15 @@
           <input matInput formControlName="category">
         </mat-form-field>
 
-        <button mat-raised-button color="primary" [disabled]="!profileForm.valid">
+        <button mat-raised-button color="primary" [disabled]="!profileForm.valid" (click)="save()">
           Speichern
         </button>
+
+        <div *ngIf="payload">
+          <h3>Payload Preview</h3>
+          <pre>{{ payload | json }}</pre>
+        </div>
+
 
       </form>
     </mat-card-content>
