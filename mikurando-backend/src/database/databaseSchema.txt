@@ -30,6 +30,7 @@ Table Restaurant {
   is_active boolean [not null]
   customer_notes text
   min_order_value numeric(8,2) [not null, default: 0]
+  service_fee numeric(8,2) [not null, default: 0]
   delivery_radius numeric(5,2) [not null]
   category text
   geo_lat numeric(9,6)

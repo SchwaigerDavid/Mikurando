@@ -3,17 +3,17 @@ const router = express.Router();
 
 // Middleware & Controller
 const orderController = require('../controllers/orderController');
-const requestParameterValidationMiddleware = require('../middleware/requestParameterValidationMiddleware');
 const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
-const orderMiddleware = require('../middleware/orderMiddleware');
+const restaurantMiddleware = require('../middleware/restaurantMiddleware');
 
 
 // Routes
-router.get('/:id',
-    requestParameterValidationMiddleware.validateIdParameter,
-    restaurantController.getRestaurantDetailsById
+router.post('',
+    restaurantMiddleware.createOrderParametersAreComplete,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireCustomer,
+    orderController.createOrder
 );
-
 
 // Exports
 module.exports = router;

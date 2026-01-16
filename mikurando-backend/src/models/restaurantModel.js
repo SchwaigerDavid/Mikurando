@@ -4,7 +4,8 @@ const queries = require('../queries/restaurantQueries');
 
 const getRestaurantDetailsById = async (id) => {
     const result = await  db.query(queries.getRestaurantDetailsById, [id]);
-    return result.rows[0];
+    if (result.rows.length === 0) return null;
+    return result.rows[0].json_build_object || result.rows[0].result;
 }
 
 const getRestaurantReviews = async (id) => {
@@ -26,10 +27,16 @@ const getDishNameById = async (dish_id, restaurant_id) => {
     return result.rows[0];
 }
 
+const getDishesByIds = async (dishIds) => {
+    const result = await db.query(queries.getDishesByIds, [dishIds]);
+    return result.rows;
+}
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
     getRestaurantNameById,
     addRestaurantReview,
-    getDishNameById
+    getDishNameById,
+    getDishesByIds
 };

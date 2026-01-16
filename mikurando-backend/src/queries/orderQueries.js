@@ -13,8 +13,10 @@ const addOrderItems = `
     SELECT $1, unnest($2::int[]), unnest($3::int[]), unnest($4::numeric[]) 
 `; // unnest unnests ;) the array of values into rows and inserts both rows
 
+const addVouchersToOrder = 'INSERT INTO "Used_Vouchers" (order_id, voucher_id) VALUES ($1, $2)'
 
 module.exports = {
     createNewOrder,
-    addOrderItems
+    addOrderItems,
+    addVouchersToOrder
 }

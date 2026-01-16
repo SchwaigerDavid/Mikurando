@@ -52,6 +52,7 @@ CREATE TABLE "Restaurant" (
   "customer_notes" text,
   "min_order_value" numeric(8,2) NOT NULL DEFAULT 0,
   "delivery_radius" numeric(5,2) NOT NULL,
+  "service_fee" numeric(8,2) NOT NULL DEFAULT 0,
   "category" text,
   "geo_lat" numeric(9,6),
   "geo_lng" numeric(9,6),

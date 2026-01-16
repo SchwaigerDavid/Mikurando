@@ -71,6 +71,8 @@ components:
           type: number
         delivery_radius:
           type: number
+        service_fee:
+          type: number
         image_data:
           type: string
           format: byte
@@ -199,7 +201,7 @@ components:
           type: string
         quantity:
           type: integer
-        price_at_order:
+        price:
           type: number
 
     # REQUEST BODIES
@@ -254,16 +256,9 @@ components:
         voucher_code:
           type: string
           nullable: true
-        delivery_address:
-          type: string
-        geo_lat:
-          type: number
-        geo_lng:
-          type: number
       required:
         - restaurant_id
         - items
-        - delivery_address
 
     CreateReviewRequest:
       type: object

@@ -37,10 +37,11 @@ const getRestaurantDetailsById = `
                    'description', r.description,
                    'address', r.address,
                    'min_order_value', r.min_order_value,
+                   'service_fee', r.service_fee,
                    'delivery_radius', r.delivery_radius,
                    'image_data', r.restaurant_image,
                    'geo_lat', r.geo_lat,
-                   'geo_long', r.geo_lng,
+                   'geo_lng', r.geo_lng,
                    'is_active', r.is_active,
                    'category', r.category,
                    'opening_hours', COALESCE(oo.opening_hours, '[]'::json),
@@ -72,10 +73,18 @@ const addRestaurantReview = `
 
 const getDishNameById = 'SELECT name FROM "Dish" WHERE dish_id = $1 AND restaurant_id = $2';
 
+const getDishesByIds = `
+    SELECT dish_id, name, price, avaliable, restaurant_id 
+    FROM "Dish" 
+    WHERE dish_id = ANY($1::int[])
+`;
+
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
     getRestaurantNameById,
     addRestaurantReview,
-    getDishNameById
+    getDishNameById,
+    getDishesByIds
 };

@@ -4,7 +4,7 @@ const queries = require('../queries/orderQueries');
 
 
 
-const createNewOrder = async (orderData, items) => {
+const createNewOrder = async (orderData, items, voucherId = null) => {
     // since we have multiple inserts we want to do this with a Transaktion in order to eiter have a complete order saved in the DB or nothing at all
     const client = await db.pool.connect(); // for that we need a client
 
@@ -23,7 +23,7 @@ const createNewOrder = async (orderData, items) => {
 
         const dishIds = items.map(i => i.dish_id);
         const quantities = items.map(i => i.quantity);
-        const prices = items.map(i => i.price);
+        const prices = items.map(i => i.price_at_order);
 
         await client.query(queries.addOrderItems, [
             order_id,
@@ -32,8 +32,15 @@ const createNewOrder = async (orderData, items) => {
             prices
         ]);
 
+        if (voucherId) {
+            await client.query(
+                queries.addVouchersToOrder,
+                [order_id, voucherId]
+            );
+        }
+
         await client.query('COMMIT');
-        return orderId;
+        return order_id;
 
     } catch (e) {
         await client.query('ROLLBACK');
