@@ -55,7 +55,18 @@ const getOrdersByUserId = async (userId) => {
     return result.rows;
 };
 
+const getOrderDetails = async (orderId, userId) => {
+    const result = await db.query(queries.getOrderDetailsById, [orderId, userId]);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    return result.rows[0].result;
+};
+
 module.exports = {
     createNewOrder,
-    getOrdersByUserId
+    getOrdersByUserId,
+    getOrderDetails
 };

@@ -5,7 +5,7 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
 const restaurantMiddleware = require('../middleware/restaurantMiddleware');
-
+const requestParameterValidationMiddleware = require('../middleware/requestParameterValidationMiddleware')
 
 // Routes
 router.post('',
@@ -19,6 +19,13 @@ router.get('',
     JWTAuthentificationMiddleware.authenticateToken,
     JWTAuthentificationMiddleware.requireCustomer,
     orderController.getOrderHistory
+)
+
+router.get('/:id',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireCustomer,
+    orderController.getOrderDetails
 )
 
 // Exports

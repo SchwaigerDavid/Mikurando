@@ -178,4 +178,28 @@ exports.getOrderHistory = async (req, res) => {
         console.error('Get Order History Error:', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+}
+
+exports.getOrderDetails = async (req, res) => {
+    const {id} = req.params;
+    const userId = req.user.userId;
+
+
+    const idInt = parseInt(id, 10);
+
+    try {
+        const order = await orderModel.getOrderDetails(idInt, userId);
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found.' });
+        }
+
+        return res.status(200).send({
+            message: 'Success',
+            data: order
+        })
+    } catch (err) {
+        console.error('Restaurant Request Error:', err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+}
