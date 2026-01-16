@@ -165,3 +165,17 @@ exports.createOrder = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+
+exports.getOrderHistory = async (req, res) => {
+    const userId = req.user.userId;
+
+    try {
+        const orders = await orderModel.getOrdersByUserId(userId);
+
+        return res.status(200).send({message: "Success", data: orders});
+
+    } catch (err) {
+        console.error('Get Order History Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

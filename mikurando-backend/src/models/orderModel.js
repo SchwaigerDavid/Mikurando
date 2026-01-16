@@ -50,6 +50,12 @@ const createNewOrder = async (orderData, items, voucherId = null) => {
     }
 };
 
+const getOrdersByUserId = async (userId) => {
+    const result = await db.query(queries.getOrdersByUserId, [userId]);
+    return result.rows;
+};
+
 module.exports = {
-    createNewOrder
+    createNewOrder,
+    getOrdersByUserId
 };

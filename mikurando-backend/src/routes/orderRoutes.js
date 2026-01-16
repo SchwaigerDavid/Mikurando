@@ -15,5 +15,11 @@ router.post('',
     orderController.createOrder
 );
 
+router.get('',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireCustomer,
+    orderController.getOrderHistory
+)
+
 // Exports
 module.exports = router;
