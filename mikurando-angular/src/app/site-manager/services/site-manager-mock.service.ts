@@ -136,7 +136,7 @@ export class SiteManagerMockService {
   }
 
   removeZone(code: string) {
-    this.settings.update((s) => ({ ...s, allowedZones: s.allowedZones.filter((z) => z !== code) }));
+     return;
   }
 
   createVoucher(v: Omit<Voucher, 'id'>) {
@@ -159,9 +159,7 @@ export class SiteManagerMockService {
     );
   }
 
-  warnUser(id: number) {
-    this.users.update((list) =>
-      list.map((u) => (u.id === id ? { ...u, warnings: u.warnings + 1, lastActionAt: new Date().toISOString() } : u)),
-    );
+  warnUser(_id?: number) {
+    return;
   }
 }
