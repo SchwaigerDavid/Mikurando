@@ -20,7 +20,7 @@ Table User {
 }
 
 Table Restaurant {
-  restaurant_id interger [primary key, increment]
+  restaurant_id integer [primary key, increment]
   owner_id integer [ref: - User.user_id]
   restaurant_name text [not null]
   description text [not null]
@@ -35,7 +35,7 @@ Table Restaurant {
   category text
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
-  restaurant_image
+  restaurant_image bytea
 }
 
 Table OpenHours {
@@ -107,7 +107,18 @@ Table Used_Vouchers{
   voucher_id integer [ref: > Voucher.voucher_id]
 }
 
+// Admin / Global Settings
+Table Global_Settings {
+  id integer [primary key]
+  default_service_fee numeric(8,2) [not null, default: 0]
+}
 
+// Admin / Delivery Zones
+Table Delivery_Zone {
+  id integer [primary key, increment]
+  zone_name text [not null]
+  max_radius_km numeric(5,2)
+}
 
 Enum order_status {
   PLACED

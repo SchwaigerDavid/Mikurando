@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { delay, Observable, of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -10,35 +11,47 @@ export type AuthUser = {
   role: Role;
 };
 
+type LoginResponse = {
+  token: string;
+  user: {
+    user_id: number;
+    email: string;
+    role: Role;
+  };
+};
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+
+  private readonly apiBaseUrl = 'http://localhost:3000';
+
   private get isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
 
   private readonly storageKeyToken = 'mikurando_token';
-  private readonly storageKeyUser = 'mikurando_user';
+  private readonly storageKeyUser = 'user';
 
   readonly token = signal<string | null>(this.readToken());
-  readonly userName = signal<string>(this.readUserName());
-
   readonly user = signal<AuthUser | null>(this.readStructuredUser());
+  readonly userName = signal<string>(this.readUserName());
 
   private readToken(): string | null {
     if (!this.isBrowser) return null;
     return localStorage.getItem(this.storageKeyToken);
   }
 
-  private readUserName(): string {
-    if (!this.isBrowser) return '';
-    return localStorage.getItem(this.storageKeyUser) ?? '';
-  }
-
   private readStructuredUser(): AuthUser | null {
     if (!this.isBrowser) return null;
-    const raw = localStorage.getItem('user');
+    const raw = localStorage.getItem(this.storageKeyUser);
     return raw ? (JSON.parse(raw) as AuthUser) : null;
+  }
+
+  private readUserName(): string {
+    if (!this.isBrowser) return '';
+    return this.readStructuredUser()?.email ?? '';
   }
 
   isLoggedIn(): boolean {
@@ -49,28 +62,37 @@ export class AuthService {
     return this.userName() || 'admin';
   }
 
-  login(username: string, password: string): Observable<{ token: string; user: string }> {
-    if (username === 'admin' && password === 'admin') {
-      return of({ token: 'fake-jwt-token', user: 'Admin' }).pipe(delay(400));
-    }
-
-    return throwError(() => new Error('Invalid username or password')).pipe(delay(400));
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiBaseUrl}/auth/login`, { email, password }).pipe(
+      tap((resp) => {
+        const u: AuthUser = {
+          userId: resp.user.user_id,
+          email: resp.user.email,
+          role: resp.user.role,
+        };
+        this.setSession(resp.token, u);
+      }),
+    );
   }
 
-  persistSession(token: string, user: string) {
-    if (this.isBrowser) {
-      localStorage.setItem(this.storageKeyToken, token);
-      localStorage.setItem(this.storageKeyUser, user);
-    }
-
-    this.token.set(token);
-    this.userName.set(user);
+  register(payload: {
+    email: string;
+    password: string;
+    role: 'CUSTOMER' | 'OWNER';
+    surname: string;
+    name: string;
+    address?: string;
+    area_code?: string;
+    geo_lat?: number;
+    geo_lng?: number;
+  }): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}/auth/register`, payload);
   }
 
   setSession(token: string, user: AuthUser) {
     if (this.isBrowser) {
       localStorage.setItem(this.storageKeyToken, token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem(this.storageKeyUser, JSON.stringify(user));
     }
 
     this.token.set(token);
@@ -82,7 +104,6 @@ export class AuthService {
     if (this.isBrowser) {
       localStorage.removeItem(this.storageKeyToken);
       localStorage.removeItem(this.storageKeyUser);
-      localStorage.removeItem('user');
     }
 
     this.token.set(null);

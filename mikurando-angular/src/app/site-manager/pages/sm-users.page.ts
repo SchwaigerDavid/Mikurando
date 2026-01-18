@@ -1,26 +1,28 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
-import { DatePipe, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 
-import { SiteManagerMockService } from '../services/site-manager-mock.service';
 import { DialogService } from '../ui/dialog.service';
 import { NotifyService } from '../ui/notify.service';
 import { LoadingOverlayService } from '../ui/loading-overlay.service';
+import { AdminApiService, AdminUserDto } from '../services/admin-api.service';
 
 @Component({
   standalone: true,
-  imports: [NgIf, DatePipe, MatCardModule, MatTableModule, MatButtonModule, MatChipsModule],
+  imports: [NgIf, MatCardModule, MatTableModule, MatButtonModule, MatChipsModule],
   template: `
     <mat-card>
       <mat-card-title>User Moderation</mat-card-title>
       <mat-card-content>
-        <p>Mock-Userverwaltung: sperren/entsperren, warnen.</p>
+        <p *ngIf="users().length === 0" style="opacity:.75; margin: 0 0 12px 0;">
+          No users found.
+        </p>
 
-        <table mat-table [dataSource]="users()" style="width:100%">
+        <table *ngIf="users().length > 0" mat-table [dataSource]="users()" style="width:100%">
           <ng-container matColumnDef="email">
             <th mat-header-cell *matHeaderCellDef>Email</th>
             <td mat-cell *matCellDef="let u">{{ u.email }}</td>
@@ -36,37 +38,21 @@ import { LoadingOverlayService } from '../ui/loading-overlay.service';
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let u">
-              <mat-chip [color]="u.status === 'SUSPENDED' ? 'warn' : undefined">{{ u.status }}</mat-chip>
-              <mat-chip>warnings: {{ u.warnings }}</mat-chip>
+              <mat-chip [color]="u.is_active ? undefined : 'warn'">{{ u.is_active ? 'ACTIVE' : 'BANNED' }}</mat-chip>
             </td>
-          </ng-container>
-
-          <ng-container matColumnDef="last">
-            <th mat-header-cell *matHeaderCellDef>Last action</th>
-            <td mat-cell *matCellDef="let u">{{ u.lastActionAt | date: 'short' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let u" style="display:flex; gap:8px; flex-wrap: wrap;">
-              <button mat-stroked-button (click)="warn(u.id)">Warn</button>
+              <button mat-stroked-button disabled title="Warn is not implemented in the backend yet">Warn</button>
 
-              <button
-                mat-stroked-button
-                color="warn"
-                *ngIf="u.status !== 'SUSPENDED'"
-                (click)="suspend(u.id, u.email)"
-              >
-                Suspend
+              <button mat-stroked-button color="warn" *ngIf="u.is_active" (click)="ban(u)">
+                Ban
               </button>
 
-              <button
-                mat-stroked-button
-                color="primary"
-                *ngIf="u.status === 'SUSPENDED'"
-                (click)="unsuspend(u.id, u.email)"
-              >
-                Unsuspend
+              <button mat-stroked-button color="primary" *ngIf="!u.is_active" (click)="unban(u)">
+                Unban
               </button>
             </td>
           </ng-container>
@@ -79,50 +65,63 @@ import { LoadingOverlayService } from '../ui/loading-overlay.service';
   `,
 })
 export class SmUsersPage {
-  private sm = inject(SiteManagerMockService);
+  private api = inject(AdminApiService);
   private dialogs = inject(DialogService);
   private notify = inject(NotifyService);
   private loading = inject(LoadingOverlayService);
 
-  users = computed(() => this.sm.getUsers()());
-  cols = ['email', 'role', 'status', 'last', 'actions'];
+  private usersState = signal<AdminUserDto[]>([]);
+  users = computed(() => this.usersState());
+  cols = ['email', 'role', 'status', 'actions'];
 
-  async suspend(id: number, email: string) {
+  constructor() {
+    this.reload();
+  }
+
+  reload() {
+    this.loading.show();
+    this.api.listUsers().subscribe({
+      next: (rows) => this.usersState.set(rows ?? []),
+      error: () => this.notify.error('Failed to load users'),
+      complete: () => this.loading.hide(),
+    });
+  }
+
+  async ban(u: AdminUserDto) {
     const ok = await this.dialogs.confirm({
-      title: 'Suspend user',
-      message: `User ${email} wirklich sperren?`,
-      confirmText: 'Suspend',
+      title: 'Ban user',
+      message: `Really ban user ${u.email}?`,
+      confirmText: 'Ban',
     });
     if (!ok) return;
 
     this.loading.show();
-    try {
-      this.sm.suspendUser(id);
-      this.notify.success('User gesperrt');
-    } finally {
-      this.loading.hide();
-    }
+    this.api.banUser(u.user_id, true).subscribe({
+      next: () => {
+        this.usersState.set(this.usersState().map((x) => (x.user_id === u.user_id ? { ...x, is_active: false } : x)));
+        this.notify.success('User banned');
+      },
+      error: () => this.notify.error('Ban failed'),
+      complete: () => this.loading.hide(),
+    });
   }
 
-  async unsuspend(id: number, email: string) {
+  async unban(u: AdminUserDto) {
     const ok = await this.dialogs.confirm({
-      title: 'Unsuspend user',
-      message: `User ${email} wirklich entsperren?`,
-      confirmText: 'Unsuspend',
+      title: 'Unban user',
+      message: `Really unban user ${u.email}?`,
+      confirmText: 'Unban',
     });
     if (!ok) return;
 
     this.loading.show();
-    try {
-      this.sm.unsuspendUser(id);
-      this.notify.success('User entsperrt');
-    } finally {
-      this.loading.hide();
-    }
-  }
-
-  warn(id: number) {
-    this.sm.warnUser(id);
-    this.notify.info('Warnung erfasst (mock)');
+    this.api.banUser(u.user_id, false).subscribe({
+      next: () => {
+        this.usersState.set(this.usersState().map((x) => (x.user_id === u.user_id ? { ...x, is_active: true } : x)));
+        this.notify.success('User unbanned');
+      },
+      error: () => this.notify.error('Unban failed'),
+      complete: () => this.loading.hide(),
+    });
   }
 }

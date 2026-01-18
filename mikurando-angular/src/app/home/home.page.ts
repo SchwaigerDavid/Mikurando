@@ -12,9 +12,9 @@ import { MatButtonModule } from '@angular/material/button';
       <mat-card>
         <mat-card-title>Mikurando</mat-card-title>
         <mat-card-content>
-          <p>Hauptmenü: wähle ein Modul.</p>
+          <p>Mainmenu: choose a module.</p>
           <div class="actions">
-            <a mat-flat-button color="primary" routerLink="/site-manager">Zum Site Manager</a>
+            <a mat-flat-button color="primary" routerLink="/admin">To Admin</a>
           </div>
         </mat-card-content>
       </mat-card>

@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { SmLoadingOverlayComponent } from './sm-loading-overlay.component';
 import { UserInfoComponent } from './user-info.component';
+import { AuthService } from '../../shared/auth/auth.service';
 
 @Component({
   selector: 'sm-shell',
@@ -30,29 +31,29 @@ import { UserInfoComponent } from './user-info.component';
 
     <mat-sidenav-container class="sm-container">
       <mat-sidenav mode="side" opened class="sm-sidenav">
-        <div class="sm-brand">Site Manager</div>
+        <div class="sm-brand">Admin</div>
         <mat-nav-list>
-          <a mat-list-item routerLink="/site-manager" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <mat-icon matListItemIcon>dashboard</mat-icon>
             <span matListItemTitle>Dashboard</span>
           </a>
-          <a mat-list-item routerLink="/site-manager/restaurants" routerLinkActive="active">
+          <a mat-list-item routerLink="/admin/restaurants" routerLinkActive="active">
             <mat-icon matListItemIcon>storefront</mat-icon>
             <span matListItemTitle>Restaurant Moderation</span>
           </a>
-          <a mat-list-item routerLink="/site-manager/settings" routerLinkActive="active">
+          <a mat-list-item routerLink="/admin/settings" routerLinkActive="active">
             <mat-icon matListItemIcon>settings</mat-icon>
             <span matListItemTitle>Global Settings</span>
           </a>
-          <a mat-list-item routerLink="/site-manager/vouchers" routerLinkActive="active">
+          <a mat-list-item routerLink="/admin/vouchers" routerLinkActive="active">
             <mat-icon matListItemIcon>sell</mat-icon>
             <span matListItemTitle>Vouchers</span>
           </a>
-          <a mat-list-item routerLink="/site-manager/reports" routerLinkActive="active">
+          <a mat-list-item routerLink="/admin/reports" routerLinkActive="active">
             <mat-icon matListItemIcon>analytics</mat-icon>
             <span matListItemTitle>Reporting</span>
           </a>
-          <a mat-list-item routerLink="/site-manager/users" routerLinkActive="active">
+          <a mat-list-item routerLink="/admin/users" routerLinkActive="active">
             <mat-icon matListItemIcon>people</mat-icon>
             <span matListItemTitle>User Moderation</span>
           </a>
@@ -112,9 +113,10 @@ import { UserInfoComponent } from './user-info.component';
 })
 export class SmShellComponent {
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   logout() {
-    // mock: zurück zur Login-Seite
+    this.auth.logout();
     this.router.navigateByUrl('/login');
   }
 }

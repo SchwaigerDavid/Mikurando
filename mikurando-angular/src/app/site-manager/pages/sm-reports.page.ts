@@ -5,9 +5,17 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 
-import { ReportingMockService, ReportRow } from '../services/reporting-mock.service';
+import { AdminApiService } from '../services/admin-api.service';
 import { NotifyService } from '../ui/notify.service';
 import { LoadingOverlayService } from '../ui/loading-overlay.service';
+
+type ReportRow = {
+  date: string; // YYYY-MM-DD
+  orders: number;
+  revenueEur: number;
+  logins: number;
+  changes: number;
+};
 
 @Component({
   standalone: true,
@@ -20,6 +28,10 @@ import { LoadingOverlayService } from '../ui/loading-overlay.service';
           <button mat-flat-button color="primary" (click)="generate()">Generate last {{ days() }} days</button>
           <button mat-stroked-button (click)="downloadCsv()" [disabled]="rows().length === 0">Download CSV</button>
         </div>
+
+        <p *ngIf="rows().length === 0" style="opacity:.75; margin: 12px 0 0 0;">
+          No report data yet (empty database or no orders in the selected range).
+        </p>
 
         <div class="kpis" *ngIf="rows().length > 0">
           <mat-card>
@@ -93,7 +105,7 @@ import { LoadingOverlayService } from '../ui/loading-overlay.service';
   ],
 })
 export class SmReportsPage {
-  private reports = inject(ReportingMockService);
+  private api = inject(AdminApiService);
   private notify = inject(NotifyService);
   private loading = inject(LoadingOverlayService);
 
@@ -112,18 +124,65 @@ export class SmReportsPage {
     };
   });
 
+  private toRange() {
+    const d = new Date();
+    const end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    const start = new Date(end);
+    start.setUTCDate(start.getUTCDate() - (this.days() - 1));
+
+    return {
+      start: start.toISOString().slice(0, 10),
+      end: end.toISOString().slice(0, 10),
+    };
+  }
+
   generate() {
     this.loading.show();
-    try {
-      this.rows.set(this.reports.generateDailyReport(this.days()));
-      this.notify.success('Report generiert (mock)');
-    } finally {
-      this.loading.hide();
-    }
+
+    const range = this.toRange();
+
+    let ordersRows: Array<{ date: string; orders: number }> = [];
+    let revenueRows: Array<{ date: string; revenue: number }> = [];
+    let changesRows: Array<{ date: string; changes: number }> = [];
+
+    this.api.reportOrders(range).subscribe({
+      next: (r) => (ordersRows = (r ?? []) as any),
+      error: () => this.notify.error('Orders report failed'),
+    });
+
+    this.api.reportRevenue(range).subscribe({
+      next: (r) => (revenueRows = (r ?? []) as any),
+      error: () => this.notify.error('Revenue report failed'),
+    });
+
+    this.api.reportUserActivity(range).subscribe({
+      next: (r) => (changesRows = (r ?? []) as any),
+      error: () => this.notify.error('User activity report failed'),
+      complete: () => {
+        const map = new Map<string, ReportRow>();
+
+        const ensure = (date: string) => {
+          if (!map.has(date)) map.set(date, { date, orders: 0, revenueEur: 0, logins: 0, changes: 0 });
+          return map.get(date)!;
+        };
+
+        for (const o of ordersRows) ensure(o.date).orders = Number((o as any).orders ?? 0);
+        for (const r of revenueRows) ensure(r.date).revenueEur = Number((r as any).revenue ?? 0);
+        for (const c of changesRows) ensure(c.date).changes = Number((c as any).changes ?? 0);
+
+        const rows = Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+        this.rows.set(rows);
+        this.notify.success('Report loaded');
+        this.loading.hide();
+      },
+    });
   }
 
   downloadCsv() {
-    const csv = this.reports.toCsv(this.rows());
+    const header = 'date,orders,revenueEur,logins,changes';
+    const lines = this.rows().map((r) => `${r.date},${r.orders},${r.revenueEur},${r.logins},${r.changes}`);
+    const csv = [header, ...lines].join('\n');
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
 
@@ -133,6 +192,6 @@ export class SmReportsPage {
     a.click();
 
     URL.revokeObjectURL(url);
-    this.notify.info('CSV Download gestartet');
+    this.notify.info('CSV download started');
   }
 }
