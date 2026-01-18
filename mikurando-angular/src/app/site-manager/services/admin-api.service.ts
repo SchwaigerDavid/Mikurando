@@ -50,31 +50,31 @@ export class AdminApiService {
   private baseUrl = 'http://localhost:3000/admin';
 
   getDashboard(): Observable<AdminDashboardDto> {
-    return this.http.get<AdminDashboardDto>('${this.baseUrl}/dashboard');
+    return this.http.get<AdminDashboardDto>(`${this.baseUrl}/dashboard`);
   }
 
   getRestaurants(): Observable<AdminPendingRestaurantDto[]> {
-    return this.http.get<AdminPendingRestaurantDto[]>('${this.baseUrl}/restaurants');
+    return this.http.get<AdminPendingRestaurantDto[]>(`${this.baseUrl}/restaurants`);
   }
 
   getPendingRestaurants(): Observable<AdminPendingRestaurantDto[]> {
-    return this.http.get<AdminPendingRestaurantDto[]>('${this.baseUrl}/restaurants/pending');
+    return this.http.get<AdminPendingRestaurantDto[]>(`${this.baseUrl}/restaurants/pending`);
   }
 
   approveRestaurant(id: number, approved: boolean): Observable<any> {
-    return this.http.patch('${this.baseUrl}/restaurants/${id}/approve', { approved });
+    return this.http.patch(`${this.baseUrl}/restaurants/${id}/approve`, { approved });
   }
 
   listUsers(): Observable<AdminUserDto[]> {
-    return this.http.get<AdminUserDto[]>('${this.baseUrl}/users');
+    return this.http.get<AdminUserDto[]>(`${this.baseUrl}/users`);
   }
 
   banUser(userId: number, isBanned: boolean): Observable<any> {
-    return this.http.patch('${this.baseUrl}/users/${userId}/ban', { is_banned: isBanned });
+    return this.http.patch(`${this.baseUrl}/users/${userId}/ban`, { is_banned: isBanned });
   }
 
   listVouchers(): Observable<AdminVoucherDto[]> {
-    return this.http.get<AdminVoucherDto[]>('${this.baseUrl}/vouchers');
+    return this.http.get<AdminVoucherDto[]>(`${this.baseUrl}/vouchers`);
   }
 
   createVoucher(payload: {
@@ -83,46 +83,46 @@ export class AdminApiService {
     is_percent: boolean;
     valid_until: string;
   }): Observable<AdminVoucherDto> {
-    return this.http.post<AdminVoucherDto>('${this.baseUrl}/vouchers', payload);
+    return this.http.post<AdminVoucherDto>(`${this.baseUrl}/vouchers`, payload);
   }
 
   deleteVoucher(voucherId: number): Observable<any> {
-    return this.http.delete('${this.baseUrl}/vouchers/${voucherId}');
+    return this.http.delete(`${this.baseUrl}/vouchers/${voucherId}`);
   }
 
   getSettings(): Observable<AdminSettingsDto> {
-    return this.http.get<AdminSettingsDto>('${this.baseUrl}/settings');
+    return this.http.get<AdminSettingsDto>(`${this.baseUrl}/settings`);
   }
 
   updateSettings(payload: { default_service_fee: number }): Observable<AdminSettingsDto> {
-    return this.http.put<AdminSettingsDto>('${this.baseUrl}/settings', payload);
+    return this.http.put<AdminSettingsDto>(`${this.baseUrl}/settings`, payload);
   }
 
   resetSettings(): Observable<AdminSettingsDto> {
-    return this.http.delete<AdminSettingsDto>('${this.baseUrl}/settings');
+    return this.http.delete<AdminSettingsDto>(`${this.baseUrl}/settings`);
   }
 
   getDeliveryZones(): Observable<DeliveryZoneDto[]> {
-    return this.http.get<DeliveryZoneDto[]>('${this.baseUrl}/delivery-zones');
+    return this.http.get<DeliveryZoneDto[]>(`${this.baseUrl}/delivery-zones`);
   }
 
   createDeliveryZone(payload: { zone_name: string; max_radius_km?: number | null }): Observable<DeliveryZoneDto> {
-    return this.http.post<DeliveryZoneDto>('${this.baseUrl}/delivery-zones', payload);
+    return this.http.post<DeliveryZoneDto>(`${this.baseUrl}/delivery-zones`, payload);
   }
 
   deleteDeliveryZone(id: number): Observable<any> {
-    return this.http.delete('${this.baseUrl}/delivery-zones/${id}');
+    return this.http.delete(`${this.baseUrl}/delivery-zones/${id}`);
   }
 
   reportOrders(params: { start: string; end: string }): Observable<any[]> {
-    return this.http.get<any[]>('${this.baseUrl}/reports/orders', { params: params as any });
+    return this.http.get<any[]>(`${this.baseUrl}/reports/orders`, { params: params as any });
   }
 
   reportRevenue(params: { start: string; end: string }): Observable<any[]> {
-    return this.http.get<any[]>('${this.baseUrl}/reports/revenue', { params: params as any });
+    return this.http.get<any[]>(`${this.baseUrl}/reports/revenue`, { params: params as any });
   }
 
   reportUserActivity(params: { start: string; end: string }): Observable<any[]> {
-    return this.http.get<any[]>('${this.baseUrl}/reports/user-activity', { params: params as any });
+    return this.http.get<any[]>(`${this.baseUrl}/reports/user-activity`, { params: params as any });
   }
 }
