@@ -5,7 +5,7 @@ module.exports = {
       (SELECT COALESCE(SUM(total_price), 0)::numeric FROM "Order") AS revenue,
       (SELECT COUNT(*)::int FROM "Restaurant" WHERE is_active = true) AS active_restaurants,
       (SELECT COUNT(*)::int FROM "User" WHERE is_active = true) AS user_activity,
-      (SELECT COUNT(*)::int FROM "Restaurant" WHERE approved = false) AS pending_restaurants
+      (SELECT COUNT(*)::int FROM "Restaurant" WHERE application_status = 'PENDING') AS pending_restaurants
   `,
 
   restaurantsAll: `
@@ -15,7 +15,8 @@ module.exports = {
       area_code,
       category,
       approved,
-      is_active
+      is_active,
+      application_status
     FROM "Restaurant"
     ORDER BY restaurant_id DESC
   `,
@@ -27,21 +28,31 @@ module.exports = {
       area_code,
       category,
       approved,
-      is_active
+      is_active,
+      application_status
     FROM "Restaurant"
-    WHERE approved = false
+    WHERE application_status = 'PENDING'
     ORDER BY restaurant_id DESC
   `,
 
   setRestaurantApproved: `
     UPDATE "Restaurant"
     SET approved = $1,
-        is_active = CASE WHEN $1 = true THEN true ELSE false END
+        is_active = CASE WHEN $1 = true THEN true ELSE false END,
+        application_status = CASE WHEN $1 = true THEN 'APPROVED'::restaurant_application_status ELSE 'PENDING'::restaurant_application_status END
     WHERE restaurant_id = $2
   `,
 
+  rejectRestaurant: `
+    UPDATE "Restaurant"
+    SET approved = false,
+        is_active = false,
+        application_status = 'REJECTED'::restaurant_application_status
+    WHERE restaurant_id = $1
+  `,
+
   listUsers: `
-    SELECT user_id, email, role, is_active
+    SELECT user_id, email, role, is_active, COALESCE(warnings, 0)::int AS warnings
     FROM "User"
     ORDER BY user_id DESC
   `,
@@ -50,6 +61,13 @@ module.exports = {
     UPDATE "User"
     SET is_active = $1
     WHERE user_id = $2
+  `,
+
+  warnUser: `
+    UPDATE "User"
+    SET warnings = COALESCE(warnings, 0) + 1
+    WHERE user_id = $1
+    RETURNING user_id, COALESCE(warnings, 0)::int AS warnings
   `,
 
   listVouchers: `

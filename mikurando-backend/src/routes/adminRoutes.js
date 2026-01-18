@@ -20,6 +20,11 @@ router.patch(
   requestParameterValidationMiddleware.validateIdParameter,
   adminController.approveRestaurant,
 );
+router.post(
+  '/restaurants/:id/reject',
+  requestParameterValidationMiddleware.validateIdParameter,
+  adminController.rejectRestaurant,
+);
 
 //user moderation
 router.get('/users', adminController.listUsers);
@@ -27,6 +32,11 @@ router.patch(
   '/users/:userId/ban',
   requestParameterValidationMiddleware.validateIdParameter,
   adminController.banUser,
+);
+router.patch(
+  '/users/:userId/warn',
+  requestParameterValidationMiddleware.validateIdParameter,
+  adminController.warnUser,
 );
 
 //vouchers

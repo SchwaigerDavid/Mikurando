@@ -41,17 +41,39 @@ import { AdminApiService, AdminPendingRestaurantDto } from '../services/admin-ap
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let r">
-              <mat-chip *ngIf="!r.approved">pending</mat-chip>
-              <mat-chip *ngIf="r.approved && r.is_active">approved</mat-chip>
-              <mat-chip *ngIf="r.approved && !r.is_active">inactive</mat-chip>
+              <mat-chip *ngIf="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) === 'PENDING'">pending</mat-chip>
+              <mat-chip *ngIf="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) === 'APPROVED'" color="primary">approved</mat-chip>
+              <mat-chip *ngIf="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) === 'REJECTED'" color="warn">rejected</mat-chip>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let r" style="display:flex; gap:8px; flex-wrap: wrap;">
-              <button mat-stroked-button color="primary" (click)="setApproved(r, true)" [disabled]="r.approved">Approve</button>
-              <button mat-stroked-button color="warn" (click)="setApproved(r, false)" [disabled]="!r.approved">Set pending</button>
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="setApproved(r, true)"
+                [disabled]="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) === 'APPROVED'"
+              >
+                Approve
+              </button>
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="setApproved(r, false)"
+                [disabled]="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) === 'PENDING'"
+              >
+                Set pending
+              </button>
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="reject(r)"
+                [disabled]="(r.application_status ?? (r.approved ? 'APPROVED' : 'PENDING')) !== 'PENDING'"
+              >
+                Reject
+              </button>
             </td>
           </ng-container>
 
@@ -89,8 +111,8 @@ export class SmRestaurantsPage {
     const ok = await this.dialogs.confirm({
       title: approved ? 'Approve restaurant' : 'Set restaurant pending',
       message: approved
-        ? 'Restaurant "${r.restaurant_name}" approved?'
-        : 'Restaurant "${r.restaurant_name}" set to "pending" again?',
+        ? `Approve restaurant "${r.restaurant_name}"?`
+        : `Set restaurant "${r.restaurant_name}" to "pending" again?`,
       confirmText: approved ? 'Approve' : 'Set pending',
     });
     if (!ok) return;
@@ -103,12 +125,42 @@ export class SmRestaurantsPage {
         this.restaurantsState.set(
           this.restaurantsState().map((x) =>
             x.restaurant_id === r.restaurant_id
-              ? { ...x, approved, is_active: approved ? true : false }
+              ? {
+                  ...x,
+                  approved,
+                  is_active: approved ? true : false,
+                  application_status: approved ? 'APPROVED' : 'PENDING',
+                }
               : x,
           ),
         );
       },
       error: () => this.notify.error('Action failed'),
+      complete: () => this.loading.hide(),
+    });
+  }
+
+  async reject(r: AdminPendingRestaurantDto) {
+    const ok = await this.dialogs.confirm({
+      title: 'Reject restaurant',
+      message: `Reject restaurant "${r.restaurant_name}"?`,
+      confirmText: 'Reject',
+    });
+    if (!ok) return;
+
+    this.loading.show();
+    this.api.rejectRestaurant(r.restaurant_id).subscribe({
+      next: () => {
+        this.notify.success('Restaurant rejected');
+        this.restaurantsState.set(
+          this.restaurantsState().map((x) =>
+            x.restaurant_id === r.restaurant_id
+              ? { ...x, approved: false, is_active: false, application_status: 'REJECTED' }
+              : x,
+          ),
+        );
+      },
+      error: () => this.notify.error('Reject failed'),
       complete: () => this.loading.hide(),
     });
   }

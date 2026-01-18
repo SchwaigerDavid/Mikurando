@@ -56,7 +56,7 @@ import { AdminApiService, AdminPendingRestaurantDto } from '../services/admin-ap
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let r" style="display:flex; gap:8px; flex-wrap: wrap;">
               <button mat-stroked-button color="primary" (click)="approve(r)">Approve</button>
-              <button mat-stroked-button color="warn" disabled title="Reject is not implemented in the backend yet">Reject</button>
+              <button mat-stroked-button color="warn" (click)="reject(r)">Reject</button>
             </td>
           </ng-container>
 
@@ -149,6 +149,25 @@ export class SmDashboardPage {
         this.pendingState.set(this.pendingState().filter((x) => x.restaurant_id !== r.restaurant_id));
       },
       error: () => this.notify.error('Approval failed'),
+      complete: () => this.loading.hide(),
+    });
+  }
+
+  async reject(r: AdminPendingRestaurantDto) {
+    const ok = await this.dialogs.confirm({
+      title: 'Reject restaurant',
+      message: `Reject restaurant "${r.restaurant_name}"?`,
+      confirmText: 'Reject',
+    });
+    if (!ok) return;
+
+    this.loading.show();
+    this.api.rejectRestaurant(r.restaurant_id).subscribe({
+      next: () => {
+        this.notify.success('Restaurant rejected');
+        this.pendingState.set(this.pendingState().filter((x) => x.restaurant_id !== r.restaurant_id));
+      },
+      error: () => this.notify.error('Reject failed'),
       complete: () => this.loading.hide(),
     });
   }

@@ -27,6 +27,11 @@ exports.setRestaurantApproved = async (restaurantId, approved) => {
   return res.rowCount > 0;
 };
 
+exports.rejectRestaurant = async (restaurantId) => {
+  const res = await db.query(adminQueries.rejectRestaurant, [restaurantId]);
+  return res.rowCount > 0;
+};
+
 exports.listUsers = async () => {
   const { rows } = await db.query(adminQueries.listUsers);
   return rows;
@@ -35,6 +40,11 @@ exports.listUsers = async () => {
 exports.setUserActive = async (userId, isActive) => {
   const res = await db.query(adminQueries.setUserActive, [isActive, userId]);
   return res.rowCount > 0;
+};
+
+exports.warnUser = async (userId) => {
+  const res = await db.query(adminQueries.warnUser, [userId]);
+  return res.rows[0] ?? null; // { user_id, warnings }
 };
 
 exports.listVouchers = async () => {

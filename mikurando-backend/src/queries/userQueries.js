@@ -21,7 +21,7 @@ const getUserByEmail =`
 
 const getUserById = `
     SELECT 
-    user_id, email, role, surname, name, address, area_code, profile_picture, geo_lat, geo_lng, is_active
+    user_id, email, role, surname, name, address, area_code, profile_picture, geo_lat, geo_lng, is_active, COALESCE(warnings, 0)::int AS warnings
     FROM "User"
     WHERE user_id = $1
 `

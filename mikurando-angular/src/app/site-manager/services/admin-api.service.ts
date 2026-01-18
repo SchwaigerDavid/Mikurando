@@ -17,6 +17,7 @@ export type AdminPendingRestaurantDto = {
   category: string | null;
   approved: boolean;
   is_active: boolean;
+  application_status?: 'PENDING' | 'APPROVED' | 'REJECTED';
 };
 
 export type AdminUserDto = {
@@ -24,6 +25,7 @@ export type AdminUserDto = {
   email: string;
   role: 'CUSTOMER' | 'OWNER' | 'MANAGER';
   is_active: boolean;
+  warnings?: number;
 };
 
 export type AdminVoucherDto = {
@@ -65,12 +67,20 @@ export class AdminApiService {
     return this.http.patch(`${this.baseUrl}/restaurants/${id}/approve`, { approved });
   }
 
+  rejectRestaurant(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/restaurants/${id}/reject`, {});
+  }
+
   listUsers(): Observable<AdminUserDto[]> {
     return this.http.get<AdminUserDto[]>(`${this.baseUrl}/users`);
   }
 
   banUser(userId: number, isBanned: boolean): Observable<any> {
     return this.http.patch(`${this.baseUrl}/users/${userId}/ban`, { is_banned: isBanned });
+  }
+
+  warnUser(userId: number): Observable<{ message: string; user_id: number; warnings: number }> {
+    return this.http.patch<{ message: string; user_id: number; warnings: number }>(`${this.baseUrl}/users/${userId}/warn`, {});
   }
 
   listVouchers(): Observable<AdminVoucherDto[]> {

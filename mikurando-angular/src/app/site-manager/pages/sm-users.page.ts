@@ -35,6 +35,11 @@ import { AdminApiService, AdminUserDto } from '../services/admin-api.service';
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="warnings">
+            <th mat-header-cell *matHeaderCellDef>Warnings</th>
+            <td mat-cell *matCellDef="let u">{{ u.warnings ?? 0 }}</td>
+          </ng-container>
+
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let u">
@@ -45,7 +50,7 @@ import { AdminApiService, AdminUserDto } from '../services/admin-api.service';
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let u" style="display:flex; gap:8px; flex-wrap: wrap;">
-              <button mat-stroked-button disabled title="Warn is not implemented in the backend yet">Warn</button>
+              <button mat-stroked-button (click)="warn(u)">Warn</button>
 
               <button mat-stroked-button color="warn" *ngIf="u.is_active" (click)="ban(u)">
                 Ban
@@ -72,7 +77,7 @@ export class SmUsersPage {
 
   private usersState = signal<AdminUserDto[]>([]);
   users = computed(() => this.usersState());
-  cols = ['email', 'role', 'status', 'actions'];
+  cols = ['email', 'role', 'warnings', 'status', 'actions'];
 
   constructor() {
     this.reload();
@@ -83,6 +88,27 @@ export class SmUsersPage {
     this.api.listUsers().subscribe({
       next: (rows) => this.usersState.set(rows ?? []),
       error: () => this.notify.error('Failed to load users'),
+      complete: () => this.loading.hide(),
+    });
+  }
+
+  async warn(u: AdminUserDto) {
+    const ok = await this.dialogs.confirm({
+      title: 'Warn user',
+      message: `Really warn user ${u.email}?`,
+      confirmText: 'Warn',
+    });
+    if (!ok) return;
+
+    this.loading.show();
+    this.api.warnUser(u.user_id).subscribe({
+      next: (resp) => {
+        this.usersState.set(
+          this.usersState().map((x) => (x.user_id === u.user_id ? { ...x, warnings: resp.warnings } : x)),
+        );
+        this.notify.success(`User warned (total: ${resp.warnings})`);
+      },
+      error: () => this.notify.error('Warn failed'),
       complete: () => this.loading.hide(),
     });
   }

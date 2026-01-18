@@ -62,6 +62,20 @@ exports.approveRestaurant = async (req, res) => {
   }
 };
 
+exports.rejectRestaurant = async (req, res) => {
+  const id = toInt(req.params.id);
+  if (id === null) return res.status(400).json({ error: 'Invalid restaurant id' });
+
+  try {
+    const updated = await adminModel.rejectRestaurant(id);
+    if (!updated) return res.status(404).json({ error: 'Restaurant not found' });
+    return res.status(200).json({ message: 'Restaurant rejected' });
+  } catch (err) {
+    console.error('Reject restaurant error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 exports.listUsers = async (req, res) => {
   try {
     const rows = await adminModel.listUsers();
@@ -85,6 +99,20 @@ exports.banUser = async (req, res) => {
     return res.status(200).json({ message: 'User status updated' });
   } catch (err) {
     console.error('Ban user error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+exports.warnUser = async (req, res) => {
+  const userId = toInt(req.params.userId);
+  if (userId === null) return res.status(400).json({ error: 'Invalid user id' });
+
+  try {
+    const row = await adminModel.warnUser(userId);
+    if (!row) return res.status(404).json({ error: 'User not found' });
+    return res.status(200).json({ message: 'User warned', user_id: row.user_id, warnings: row.warnings });
+  } catch (err) {
+    console.error('Warn user error:', err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
