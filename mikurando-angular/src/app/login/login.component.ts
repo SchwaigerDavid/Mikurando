@@ -29,7 +29,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 })
 export class LoginComponent {
   loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    email: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required])
   });
 
@@ -40,7 +40,18 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
       this.authService.login(email!, password!).subscribe({
         next: () => {
-          this.snackBar.open('Access granted', 'Close', { duration: 1500 });
+          const warnings = this.authService.getWarningsCount();
+          if (this.authService.shouldShowWarningsPopup()) {
+            this.snackBar.open(
+              warnings === 1 ? 'You have 1 warning on your account.' : `You have ${warnings} warnings on your account.`,
+              'OK',
+              { duration: 6000 },
+            );
+            this.authService.markWarningsPopupShown();
+          } else {
+            this.snackBar.open('Access granted', 'Close', { duration: 1500 });
+          }
+
           this.router.navigateByUrl('/home');
         },
         error: () => {

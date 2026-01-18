@@ -9,6 +9,7 @@ export type AuthUser = {
   userId: number;
   email: string;
   role: Role;
+  warnings?: number;
 };
 
 type LoginResponse = {
@@ -17,6 +18,7 @@ type LoginResponse = {
     user_id: number;
     email: string;
     role: Role;
+    warnings?: number;
   };
 };
 
@@ -33,6 +35,7 @@ export class AuthService {
 
   private readonly storageKeyToken = 'mikurando_token';
   private readonly storageKeyUser = 'user';
+  private readonly storageKeyWarningsShown = 'mikurando_warnings_shown_for';
 
   readonly token = signal<string | null>(this.readToken());
   readonly user = signal<AuthUser | null>(this.readStructuredUser());
@@ -69,6 +72,7 @@ export class AuthService {
           userId: resp.user.user_id,
           email: resp.user.email,
           role: resp.user.role,
+          warnings: (resp.user as any).warnings ?? 0,
         };
         this.setSession(resp.token, u);
       }),
@@ -113,5 +117,29 @@ export class AuthService {
 
   hasRole(role: Role): boolean {
     return this.user()?.role === role;
+  }
+
+  getWarningsCount(): number {
+    return Number(this.user()?.warnings ?? 0);
+  }
+
+  shouldShowWarningsPopup(): boolean {
+    if (!this.isBrowser) return false;
+    const u = this.user();
+    if (!u) return false;
+
+    const current = Number(u.warnings ?? 0);
+    if (current <= 0) return false;
+
+    const key = `${u.userId}:${current}`;
+    return localStorage.getItem(this.storageKeyWarningsShown) !== key;
+  }
+
+  markWarningsPopupShown() {
+    if (!this.isBrowser) return;
+    const u = this.user();
+    if (!u) return;
+    const current = Number(u.warnings ?? 0);
+    localStorage.setItem(this.storageKeyWarningsShown, `${u.userId}:${current}`);
   }
 }
