@@ -8,17 +8,17 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Benutzername</mat-label>
-          <input matInput formControlName="username" placeholder="z.B. admin">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="e.g. manager@mikurando.at">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Passwort</mat-label>
+          <mat-label>Password</mat-label>
           <input matInput type="password" formControlName="password">
         </mat-form-field>
 
         <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">
-          Einloggen
+          Login
         </button>
 
         <a routerLink="/register">Register</a>

@@ -29,7 +29,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 })
 export class LoginComponent {
   loginForm = new FormGroup({
-    username: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
 
@@ -37,15 +37,14 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.authService.login(username!, password!).subscribe({
-        next: (data) => {
-          this.authService.persistSession(data.token, data.user);
+      const { email, password } = this.loginForm.value;
+      this.authService.login(email!, password!).subscribe({
+        next: () => {
           this.snackBar.open('Access granted', 'Close', { duration: 1500 });
           this.router.navigateByUrl('/home');
         },
         error: () => {
-          this.snackBar.open('Invalid username or password', 'Close', {
+          this.snackBar.open('Invalid email or password', 'Close', {
             duration: 4000,
             panelClass: ['error-snackbar']
           });
