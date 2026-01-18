@@ -32,10 +32,29 @@ const getUserById = async (id) => {
     return result.rows[0];
 }
 
+const updateUser = async (userId, data) => {
+    const { email, surname, name, address, area_code, geo_lat, geo_lng, profile_picture_data } = data;
+
+    const result = await db.query(queries.updateUserProfile, [
+        email,
+        surname,
+        name,
+        address,
+        geo_lat,
+        geo_lng,
+        profile_picture_data,
+        area_code,
+        userId
+    ]);
+
+    return result.rows[0];
+};
+
 module.exports = {
     getUserIdByEmail,
     createUser,
     getUserByEmail,
     getUserNameById,
-    getUserById
+    getUserById,
+    updateUser
 };

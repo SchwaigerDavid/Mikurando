@@ -369,23 +369,51 @@ paths:
         '404':
           description: User not found (e.g. account deleted)
     put:
-      summary: Update profile info
-      tags: [User]
-      security: [{ BearerAuth: [] }]
+      summary: Update current user profile
+      tags: [ User ]
+      security: [ { BearerAuth: [ ] } ]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                surname:
+                  type: string
+                name:
+                  type: string
+                address:
+                  type: string
+                area_code:
+                  type: string
+                geo_lat:
+                  type: number
+                geo_lng:
+                  type: number
+                profile_picture_data:
+                  type: string
+              required:
+                - email
+                - surname
+                - name
       responses:
         '200':
           description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request (Missing fields)
         '401':
           description: Unauthorized (Invalid or missing token)
-        '403':
-          description: Forbidden (Account is banned)
-        '404':
-          description: User not found (e.g. account deleted)
+        '409':
+          description: Conflict (Email already in use)
+
 
   # Restaurants
   /restaurants:

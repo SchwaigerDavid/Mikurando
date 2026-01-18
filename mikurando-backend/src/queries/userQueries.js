@@ -26,10 +26,27 @@ const getUserById = `
     WHERE user_id = $1
 `
 
+const updateUserProfile = `
+    UPDATE "User"
+    SET 
+        email = $1,
+        surname = $2,
+        name = $3,
+        address = $4,
+        geo_lat = $5,
+        geo_lng = $6,
+        profile_picture = $7,
+        area_code = $8        
+    WHERE user_id = $9        
+    RETURNING user_id, email, role, surname, name, address, area_code, geo_lat, geo_lng, profile_picture
+`;
+
+
 module.exports = {
     registerUser,
     checkEmailExists,
     getUserByEmail,
     getUserNameById,
     getUserById,
+    updateUserProfile
 }
