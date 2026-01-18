@@ -17,6 +17,7 @@ Table User {
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
   is_active boolean [not null, default: true]
+  warnings integer [not null, default: 0]
 }
 
 Table Restaurant {
@@ -28,6 +29,7 @@ Table Restaurant {
   area_code text [not null]
   approved boolean [not null]
   is_active boolean [not null]
+  application_status restaurant_application_status [not null, default: 'PENDING']
   customer_notes text
   min_order_value numeric(8,2) [not null, default: 0]
   service_fee numeric(8,2) [not null, default: 0]
@@ -145,4 +147,10 @@ Enum role {
   CUSTOMER
   OWNER
   MANAGER
+}
+
+Enum restaurant_application_status {
+  PENDING
+  APPROVED
+  REJECTED
 }
