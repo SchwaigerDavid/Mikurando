@@ -29,7 +29,7 @@ import { AdminApiService, AdminPendingRestaurantDto } from '../services/admin-ap
         <mat-card-content class="metric">{{ stats().activeRestaurants }}</mat-card-content>
       </mat-card>
       <mat-card>
-        <mat-card-title>User Activity</mat-card-title>
+        <mat-card-title>Active Accounts</mat-card-title>
         <mat-card-content class="metric">{{ stats().userActivity }}</mat-card-content>
       </mat-card>
     </div>

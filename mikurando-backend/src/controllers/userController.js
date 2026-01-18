@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const userEventModel = require('../models/userEventModel');
 
 exports.getUserProfile = async (req, res) => {
     const user_id = req.user.userId;
@@ -57,6 +58,8 @@ exports.updateProfile = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ error: 'User not found.' });
         }
+
+        await userEventModel.recordEvent(userId, 'PROFILE_UPDATE');
 
         return res.status(200).json({
             message: 'Profil update succesfull',

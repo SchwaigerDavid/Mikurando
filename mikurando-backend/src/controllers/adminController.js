@@ -296,3 +296,16 @@ exports.reportUserActivity = async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+exports.reportUserEvents = async (req, res) => {
+  const range = parseDateRange(req);
+  if (!range) return res.status(400).json({ error: 'start and end query params are required (ISO date)' });
+
+  try {
+    const rows = await adminModel.reportUserEvents(range.start, range.end);
+    return res.status(200).json(rows);
+  } catch (err) {
+    console.error('Report user events error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

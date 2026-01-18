@@ -135,4 +135,8 @@ export class AdminApiService {
   reportUserActivity(params: { start: string; end: string }): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/reports/user-activity`, { params: params as any });
   }
+
+  reportUserEvents(params: { start: string; end: string }): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/reports/user-events`, { params: params as any });
+  }
 }

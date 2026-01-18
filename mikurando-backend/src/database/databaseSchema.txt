@@ -109,6 +109,13 @@ Table Used_Vouchers{
   voucher_id integer [ref: > Voucher.voucher_id]
 }
 
+Table User_Event {
+  id integer [primary key, increment]
+  user_id integer [ref: > User.user_id]
+  event_type user_event_type [not null]
+  created_at timestamptz [not null]
+}
+
 // Admin / Global Settings
 Table Global_Settings {
   id integer [primary key]
@@ -153,4 +160,9 @@ Enum restaurant_application_status {
   PENDING
   APPROVED
   REJECTED
+}
+
+Enum user_event_type {
+  LOGIN
+  PROFILE_UPDATE
 }

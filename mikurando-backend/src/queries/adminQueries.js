@@ -157,4 +157,36 @@ module.exports = {
     GROUP BY 1
     ORDER BY 1 ASC
   `,
+
+  reportUserEvents: `
+    WITH bounds AS (
+      SELECT
+        $1::date AS start_day,
+        $2::date AS end_day
+    ),
+    days AS (
+      SELECT generate_series(
+        (SELECT start_day FROM bounds),
+        (SELECT end_day FROM bounds),
+        interval '1 day'
+      )::date AS day
+    ),
+    agg AS (
+      SELECT
+        (created_at AT TIME ZONE 'UTC')::date AS day,
+        COUNT(*) FILTER (WHERE event_type = 'LOGIN')::int AS logins,
+        COUNT(*) FILTER (WHERE event_type = 'PROFILE_UPDATE')::int AS changes
+      FROM "User_Event"
+      WHERE (created_at AT TIME ZONE 'UTC')::date >= (SELECT start_day FROM bounds)
+        AND (created_at AT TIME ZONE 'UTC')::date <= (SELECT end_day FROM bounds)
+      GROUP BY 1
+    )
+    SELECT
+      to_char(days.day, 'YYYY-MM-DD') AS date,
+      COALESCE(agg.logins, 0)::int AS logins,
+      COALESCE(agg.changes, 0)::int AS changes
+    FROM days
+    LEFT JOIN agg ON agg.day = days.day
+    ORDER BY days.day ASC
+  `,
 };

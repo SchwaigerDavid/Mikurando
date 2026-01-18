@@ -111,3 +111,8 @@ exports.reportUserActivity = async (start, end) => {
   const { rows } = await db.query(adminQueries.reportUserActivity, [start, end]);
   return rows;
 };
+
+exports.reportUserEvents = async (start, end) => {
+  const { rows } = await db.query(adminQueries.reportUserEvents, [start, end]);
+  return rows;
+};

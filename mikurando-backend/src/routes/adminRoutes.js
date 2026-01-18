@@ -66,5 +66,6 @@ router.delete(
 router.get('/reports/orders', adminController.reportOrders);
 router.get('/reports/revenue', adminController.reportRevenue);
 router.get('/reports/user-activity', adminController.reportUserActivity);
+router.get('/reports/user-events', adminController.reportUserEvents);
 
 module.exports = router;
