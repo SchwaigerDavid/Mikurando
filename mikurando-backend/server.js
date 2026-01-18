@@ -11,7 +11,6 @@ const adminRoutes = require('./src/routes/adminRoutes');
 
 const app = express();  // Create Express Application
 
-app.use(cors());  // Allow incoming Requests to come from different Origins (Use CORS for the app)
 app.use(
   cors({
     origin: true,

@@ -8,6 +8,10 @@ exports.register = async (req, res) => {
     } = req.body;
 
     try {
+        if (role === 'MANAGER') {
+            return res.status(403).json({ error: 'MANAGER registration is not allowed.' });
+        }
+
         const existingUser = await userModel.getUserIdByEmail(email);
 
         if (existingUser) {
