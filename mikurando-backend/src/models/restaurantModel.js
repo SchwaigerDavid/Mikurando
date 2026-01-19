@@ -82,6 +82,61 @@ const updateOpeningHours = async (restaurantId, ownerId, schedule) => {
     }
 };
 
+const addDish = async (restaurantId, dishData) => {
+    const { category_id, name, description, price, available, image_data } = dishData;
+
+    const result = await db.query(queries.addDish, [
+        restaurantId,
+        category_id,
+        name,
+        description,
+        price,
+        available,
+        image_data || ''
+    ]);
+    return result.rows[0];
+};
+
+const updateDish = async (dishId, restaurantId, ownerId, dishData) => {
+    const { category_id, name, description, price, available, image_data } = dishData;
+
+    const result = await db.query(queries.updateDish, [
+        name,
+        description,
+        price,
+        image_data || '',
+        available,
+        category_id,
+        dishId,
+        restaurantId,
+        ownerId
+    ]);
+    return result.rows[0];
+};
+
+const deleteDish = async (dishId, restaurantId, ownerId) => {
+    const result = await db.query(queries.deleteDish, [dishId, restaurantId, ownerId]);
+    return result.rows.length > 0;
+};
+
+const checkOwnership = async (restaurantId, ownerId) => {
+    const res = await db.query(queries.checkRestaurantOwnership, [restaurantId, ownerId]);
+    return res.rows.length > 0;
+};
+
+const setAvailability = async (dishId, restaurantId, isAvailable) => {
+    const result = await db.query(queries.updateDishAvailability, [
+        isAvailable,
+        dishId,
+        restaurantId
+    ]);
+    return result.rows[0];
+};
+
+const verifyCategoryOwnership = async (categoryId, restaurantId) => {
+    const res = await db.query(queries.checkCategoryBelongsToRestaurant, [categoryId, restaurantId]);
+    return res.rows.length > 0;
+};
 
 module.exports = {
     getRestaurantDetailsById,
@@ -91,5 +146,11 @@ module.exports = {
     getDishNameById,
     getDishesByIds,
     searchRestaurants,
-    updateOpeningHours
+    updateOpeningHours,
+    addDish,
+    updateDish,
+    deleteDish,
+    checkOwnership,
+    setAvailability,
+    verifyCategoryOwnership
 };

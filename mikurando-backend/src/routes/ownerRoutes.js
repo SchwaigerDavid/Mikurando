@@ -9,6 +9,7 @@ const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
 const requestParameterValidationMiddleware = require('../middleware/requestParameterValidationMiddleware')
 const enumValidation = require('../middleware/enumValidation')
 const ownerMiddleware = require('../middleware/ownerMiddleware');
+const restaurantMiddleware = require('../middleware/restaurantMiddleware');
 
 // Routes
 router.get('',
@@ -63,6 +64,37 @@ router.put('/:restaurantId/opening-hours',
     enumValidation.validateScheduleDays,
     restaurantController.updateOpeningHours
 )
+
+router.post('/:restaurantId/dishes',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantMiddleware.checkDishParameters,
+    restaurantController.createDish
+);
+
+router.put('/:restaurantId/dishes/:dishId',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantMiddleware.checkDishParameters,
+    restaurantController.updateDish
+);
+
+router.delete('/:restaurantId/dishes/:dishId',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantController.deleteDish
+);
+
+router.patch('/:restaurantId/dishes/:dishId',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantMiddleware.checkAvailabilityParameter,
+    restaurantController.setDishAvailability
+);
 
 // Exports
 module.exports = router;

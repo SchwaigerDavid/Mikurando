@@ -29,7 +29,30 @@ const createOrderParametersAreComplete = (req, res, next) => {
     next();
 }
 
+const checkDishParameters = (req, res, next) => {
+    const { category_id, name, price } = req.body;
+
+    if (!name || !price || !category_id) {
+        return res.status(400).json({ error: 'Name, Price and Category ID are required.' });
+    }
+
+    next();
+}
+
+const checkAvailabilityParameter = (req, res, next) => {
+    const { available } = req.body;
+
+    if (typeof available !== 'boolean') {
+        return res.status(400).json({ error: 'Field "available" must be true or false.' });
+    }
+
+    next();
+
+}
+
 module.exports = {
     ratingIsValidNumber,
-    createOrderParametersAreComplete
+    createOrderParametersAreComplete,
+    checkDishParameters,
+    checkAvailabilityParameter
 };

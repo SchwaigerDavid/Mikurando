@@ -954,6 +954,40 @@ paths:
           description: Forbidden (User is not an OWNER or restaurant belongs to another Owner)
         '404':
           description: Restaurant / Dish not Found
+    patch:
+      summary: Quickly update dish availability
+      tags: [ Owner ]
+      security: [ { BearerAuth: [ ] } ]
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Only the availability flag
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                available:
+                  type: boolean
+              required:
+                - available
+      responses:
+        '200':
+          description: Status updated
+        '400':
+          description: Bad Request
+        '404':
+          description: Dish not found
 
 
   /owner/restaurants/{restaurantId}/categories:

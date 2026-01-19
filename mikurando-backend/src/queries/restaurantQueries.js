@@ -116,6 +116,54 @@ const insertOpeningHours = `
     SELECT $1, unnest($2::week_day[]), unnest($3::time[]), unnest($4::time[])
 `;
 
+const addDish = `
+    INSERT INTO "Dish" 
+    (restaurant_id, category_id, name, description, price, avaliable, dish_bytea)
+    VALUES ($1, $2, $3, $4, $5, $6, decode($7, 'base64')) 
+    RETURNING 
+        dish_id, name, description, price, avaliable, category_id, 
+        encode(dish_bytea, 'base64') as image_data 
+`;
+
+const updateDish = `
+    UPDATE "Dish"
+    SET 
+        name = $1, 
+        description = $2, 
+        price = $3, 
+        dish_bytea = $4,  
+        avaliable = $5, 
+        category_id = $6
+    FROM "Restaurant" r
+    WHERE "Dish".dish_id = $7
+      AND "Dish".restaurant_id = $8      
+      AND "Dish".restaurant_id = r.restaurant_id
+      AND r.owner_id = $9                
+    RETURNING "Dish".*
+`;
+
+const deleteDish = `
+    DELETE FROM "Dish"
+    USING "Restaurant" r
+    WHERE "Dish".dish_id = $1
+      AND "Dish".restaurant_id = $2
+      AND "Dish".restaurant_id = r.restaurant_id
+      AND r.owner_id = $3
+    RETURNING "Dish".dish_id
+`;
+
+const updateDishAvailability = `
+    UPDATE "Dish"
+    SET avaliable = $1
+    WHERE dish_id = $2 AND restaurant_id = $3
+    RETURNING dish_id, avaliable
+`;
+
+const checkCategoryBelongsToRestaurant = `
+    SELECT 1 FROM "Categories" 
+    WHERE category_id = $1 AND restaurant_id = $2
+`;
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -126,5 +174,10 @@ module.exports = {
     searchRestaurants,
     checkRestaurantOwnership,
     deleteOpeningHours,
-    insertOpeningHours
+    insertOpeningHours,
+    addDish,
+    updateDish,
+    deleteDish,
+    updateDishAvailability,
+    checkCategoryBelongsToRestaurant
 };
