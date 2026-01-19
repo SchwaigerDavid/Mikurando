@@ -8,6 +8,7 @@ const restaurantRoutes = require('./src/routes/restaurantRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
+const ownerRoutes = require('./src/routes/ownerRoutes');
 
 const app = express();  // Create Express Application
 
@@ -27,6 +28,7 @@ app.use('/restaurant', restaurantRoutes);
 app.use('/user', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admin', adminRoutes);
+app.use('/owner/restaurants', ownerRoutes);
 
 
 
