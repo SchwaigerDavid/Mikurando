@@ -1,4 +1,4 @@
-const checkRestaurantCreation = (req, res, next) => {
+const checkRestaurantCreationAndUpdate = (req, res, next) => {
     const {
         restaurant_name, description, address, area_code, customer_notes,
         min_order_value, delivery_radius, service_fee,
@@ -14,5 +14,5 @@ const checkRestaurantCreation = (req, res, next) => {
 }
 
 module.exports = {
-    checkRestaurantCreation
+    checkRestaurantCreationAndUpdate
 }

@@ -70,3 +70,28 @@ exports.getRestaurantDetails = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+exports.updateRestaurant = async (req, res) => {
+    const { restaurant_name, description, address, area_code, customer_notes, min_order_value, delivery_radius,
+        category, geo_lat, geo_lng, image_data, service_fee } = req.body;
+    const ownerId = req.user.userId;
+    const restaurantId = req.params.id;
+    const restaurantIdInt = parseInt(req.params.id);
+
+    try {
+        const updatedRestaurant = await ownerModel.updateRestaurant(ownerId, restaurantIdInt, {restaurant_name, description, address, area_code, customer_notes, min_order_value, delivery_radius,
+            category, geo_lat, geo_lng, image_data, service_fee})
+
+        if (!updatedRestaurant) {
+            return res.status(404).json({ error: 'Restaurant not found.' });
+        }
+
+        return res.status(200).send({
+            message: 'Restaurant update successful',
+            data: updatedRestaurant
+        });
+    } catch (err) {
+        console.error('Update restaurant details Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}

@@ -43,8 +43,39 @@ const getRestaurantDetails = `
     AND restaurant_id = $2
 `
 
+const updateRestaurant = `
+    UPDATE "Restaurant"
+    SET
+        restaurant_name = $1,
+        description = $2, 
+        address = $3,
+        area_code = $4,
+        customer_notes = $5,
+        min_order_value = $6,
+        delivery_radius = $7,
+        category = $8,
+        geo_lat = $9,
+        geo_lng = $10,
+        restaurant_image = $11,
+        service_fee = $12
+    WHERE owner_id = $13 AND restaurant_id = $14
+    RETURNING 
+        restaurant_id,
+        restaurant_name,
+        description,
+        address,
+        min_order_value,
+        delivery_radius,
+        restaurant_image as image_data,
+        geo_lat,
+        geo_lng,
+        is_active,
+        category
+`
+
 module.exports = {
     getRestaurantsByOwnerId,
     createRestaurant,
-    getRestaurantDetails
+    getRestaurantDetails,
+    updateRestaurant
 }

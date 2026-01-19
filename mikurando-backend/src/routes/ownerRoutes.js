@@ -17,7 +17,7 @@ router.get('',
 router.post('',
     JWTAuthentificationMiddleware.authenticateToken,
     JWTAuthentificationMiddleware.requireOwner,
-    ownerMiddleware.checkRestaurantCreation,
+    ownerMiddleware.checkRestaurantCreationAndUpdate,
     ownerController.createRestaurant
 )
 
@@ -26,6 +26,13 @@ router.get('/:id',
     JWTAuthentificationMiddleware.authenticateToken,
     JWTAuthentificationMiddleware.requireOwner,
     ownerController.getRestaurantDetails
+)
+
+router.put('/:id',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    ownerMiddleware.checkRestaurantCreationAndUpdate,
+    ownerController.updateRestaurant
 )
 
 // Exports

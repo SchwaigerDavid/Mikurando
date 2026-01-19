@@ -28,8 +28,19 @@ const getRestaurantDetails = async (ownerId, restaurantId) => {
     return result.rows[0];
 }
 
+const updateRestaurant = async (ownerId, restaurantId, data) => {
+    const { restaurant_name, description, address, area_code, customer_notes, min_order_value, delivery_radius,
+        category, geo_lat, geo_lng, image_data, service_fee } = data;
+    const result = await db.query(queries.updateRestaurant, [
+        restaurant_name, description, address, area_code, customer_notes  || "", min_order_value, delivery_radius,
+        category, geo_lat, geo_lng, image_data, service_fee, ownerId, restaurantId
+    ]);
+    return result.rows[0];
+}
+
 module.exports = {
     getRestaurantsByOwnerId,
     createRestaurant,
-    getRestaurantDetails
+    getRestaurantDetails,
+    updateRestaurant
 }
