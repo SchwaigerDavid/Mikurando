@@ -44,6 +44,45 @@ const searchRestaurants = async (filters) => {
     return result.rows;
 };
 
+const updateOpeningHours = async (restaurantId, ownerId, schedule) => {
+    const client = await db.pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        const check = await client.query(queries.checkRestaurantOwnership, [restaurantId, ownerId]);
+        if (check.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return false; // Restaurant not found / not owned by ownerId
+        }
+
+        await client.query(queries.deleteOpeningHours, [restaurantId]);
+
+        if (schedule && schedule.length > 0) {
+            const days = schedule.map(s => s.day);
+            const opens = schedule.map(s => s.open_from);
+            const closes = schedule.map(s => s.open_till);
+
+            await client.query(queries.insertOpeningHours, [
+                restaurantId,
+                days,
+                opens,
+                closes
+            ]);
+        }
+
+        await client.query('COMMIT');
+        return true;
+
+    } catch (e) {
+        await client.query('ROLLBACK');
+        throw e;
+    } finally {
+        client.release();
+    }
+};
+
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -51,5 +90,6 @@ module.exports = {
     addRestaurantReview,
     getDishNameById,
     getDishesByIds,
-    searchRestaurants
+    searchRestaurants,
+    updateOpeningHours
 };

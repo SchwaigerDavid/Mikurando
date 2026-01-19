@@ -101,6 +101,21 @@ const searchRestaurants = `
         AND ($3::text IS NULL OR area_code = $3)
 `;
 
+const checkRestaurantOwnership = `
+    SELECT restaurant_id FROM "Restaurant" 
+    WHERE restaurant_id = $1 AND owner_id = $2
+`;
+
+const deleteOpeningHours = `
+    DELETE FROM "OpenHours" 
+    WHERE restaurant_id = $1
+`;
+
+const insertOpeningHours = `
+    INSERT INTO "OpenHours" (restaurant_id, day, open_from, open_till)
+    SELECT $1, unnest($2::week_day[]), unnest($3::time[]), unnest($4::time[])
+`;
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -108,5 +123,8 @@ module.exports = {
     addRestaurantReview,
     getDishNameById,
     getDishesByIds,
-    searchRestaurants
+    searchRestaurants,
+    checkRestaurantOwnership,
+    deleteOpeningHours,
+    insertOpeningHours
 };

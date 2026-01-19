@@ -140,3 +140,28 @@ exports.searchRestaurants = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.updateOpeningHours = async (req, res) => {
+    const { restaurantId } = req.params;
+    const { schedule } = req.body;
+    const ownerId = req.user.userId;
+
+
+    try {
+        const success = await restaurantModel.updateOpeningHours(
+            parseInt(restaurantId, 10),
+            ownerId,
+            schedule
+        );
+
+        if (!success) {
+            return res.status(404).json({ error: 'Restaurant not found or permission denied.' });
+        }
+
+        res.status(200).json({ message: 'Hours updated successfully.' });
+
+    } catch (err) {
+        console.error('Update Hours Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

@@ -4,6 +4,7 @@ const router = express.Router();
 // Middleware & Controller
 const ownerController= require('../controllers/ownerController');
 const orderController = require('../controllers/orderController');
+const restaurantController = require('../controllers/restaurantController');
 const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
 const requestParameterValidationMiddleware = require('../middleware/requestParameterValidationMiddleware')
 const enumValidation = require('../middleware/enumValidation')
@@ -52,6 +53,15 @@ router.patch('/:restaurantId/orders/:orderId/status',
     JWTAuthentificationMiddleware.requireOwner,
     enumValidation.validateStatusEnum,
     orderController.updateStatus
+)
+
+router.put('/:restaurantId/opening-hours',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    enumValidation.validateScheduleFormat,
+    enumValidation.validateScheduleDays,
+    restaurantController.updateOpeningHours
 )
 
 // Exports
