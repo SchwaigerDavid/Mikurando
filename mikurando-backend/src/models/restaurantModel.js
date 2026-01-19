@@ -138,6 +138,21 @@ const verifyCategoryOwnership = async (categoryId, restaurantId) => {
     return res.rows.length > 0;
 };
 
+const getCategories = async (restaurantId) => {
+    const result = await db.query(queries.getCategories, [restaurantId]);
+    return result.rows;
+};
+
+const addCategory = async (restaurantId, name) => {
+    const result = await db.query(queries.addCategory, [restaurantId, name]);
+    return result.rows[0];
+};
+
+const deleteCategory = async (categoryId, restaurantId) => {
+    const result = await db.query(queries.deleteCategory, [categoryId, restaurantId]);
+    return result.rows.length > 0;
+};
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -152,5 +167,8 @@ module.exports = {
     deleteDish,
     checkOwnership,
     setAvailability,
-    verifyCategoryOwnership
+    verifyCategoryOwnership,
+    getCategories,
+    addCategory,
+    deleteCategory
 };

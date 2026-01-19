@@ -50,9 +50,20 @@ const checkAvailabilityParameter = (req, res, next) => {
 
 }
 
+const checkCategoryParameter = (req, res, next) => {
+    const { category_name } = req.body;
+
+    if (!category_name) {
+        return res.status(400).json({ error: 'category_name is required.' });
+    }
+
+    next();
+}
+
 module.exports = {
     ratingIsValidNumber,
     createOrderParametersAreComplete,
     checkDishParameters,
-    checkAvailabilityParameter
+    checkAvailabilityParameter,
+    checkCategoryParameter
 };

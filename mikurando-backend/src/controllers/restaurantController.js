@@ -277,3 +277,68 @@ exports.setDishAvailability = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
+exports.getCategories = async (req, res) => {
+    const { restaurantId } = req.params;
+    const ownerId = req.user.userId;
+
+    try {
+        const isOwner = await restaurantModel.checkOwnership(restaurantId, ownerId);
+        if (!isOwner) return res.status(403).json({ error: 'Access denied.' });
+
+        const categories = await restaurantModel.getCategories(restaurantId);
+        res.status(200).json(categories);
+
+    } catch (err) {
+        console.error('Get Categories Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+exports.createCategory = async (req, res) => {
+    const { restaurantId } = req.params;
+    const ownerId = req.user.userId;
+    const { category_name } = req.body;
+
+    try {
+        const isOwner = await restaurantModel.checkOwnership(restaurantId, ownerId);
+        if (!isOwner) return res.status(403).json({ error: 'Access denied.' });
+
+        const newCategory = await restaurantModel.addCategory(restaurantId, category_name);
+        res.status(201).json(newCategory);
+
+    } catch (err) {
+        console.error('Create Category Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.deleteCategory = async (req, res) => {
+    const { restaurantId, categoryId } = req.params;
+    const ownerId = req.user.userId;
+
+    try {
+        const isOwner = await restaurantModel.checkOwnership(restaurantId, ownerId);
+        if (!isOwner) return res.status(403).json({ error: 'Access denied.' });
+
+        const deleted = await restaurantModel.deleteCategory(categoryId, restaurantId);
+
+        if (!deleted) {
+            return res.status(404).json({ error: 'Category not found.' });
+        }
+
+        res.status(200).json({ message: 'Category deleted successfully.' });
+
+    } catch (err) {
+        //  Error 23503 (Foreign Key Violation)
+        if (err.code === '23503') {
+            return res.status(400).json({
+                error: 'Cannot delete category because it still contains dishes. Please delete or move dishes first.'
+            });
+        }
+        console.error('Delete Category Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

@@ -164,6 +164,25 @@ const checkCategoryBelongsToRestaurant = `
     WHERE category_id = $1 AND restaurant_id = $2
 `;
 
+const getCategories = `
+    SELECT category_id, category_name 
+    FROM "Categories" 
+    WHERE restaurant_id = $1
+    ORDER BY category_id
+`;
+
+const addCategory = `
+    INSERT INTO "Categories" (restaurant_id, category_name)
+    VALUES ($1, $2)
+    RETURNING category_id, category_name
+`;
+
+const deleteCategory = `
+    DELETE FROM "Categories"
+    WHERE category_id = $1 AND restaurant_id = $2
+    RETURNING category_id
+`;
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -179,5 +198,8 @@ module.exports = {
     updateDish,
     deleteDish,
     updateDishAvailability,
-    checkCategoryBelongsToRestaurant
+    checkCategoryBelongsToRestaurant,
+    getCategories,
+    addCategory,
+    deleteCategory
 };

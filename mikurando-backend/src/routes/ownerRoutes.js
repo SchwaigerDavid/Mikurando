@@ -96,5 +96,28 @@ router.patch('/:restaurantId/dishes/:dishId',
     restaurantController.setDishAvailability
 );
 
+
+router.get('/:restaurantId/categories',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantController.getCategories
+);
+
+router.post('/:restaurantId/categories',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantMiddleware.checkCategoryParameter,
+    restaurantController.createCategory
+);
+
+router.delete('/:restaurantId/categories/:categoryId',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantController.deleteCategory
+);
+
 // Exports
 module.exports = router;
