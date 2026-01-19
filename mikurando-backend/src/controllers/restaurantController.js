@@ -1,4 +1,7 @@
 const restaurantModel = require('../models/restaurantModel');
+const userModel = require('../models/userModel');
+
+const {calculateDistance} = require('../utils/locationUtils')
 
 exports.getRestaurantDetailsById = async (req, res) => {
     const {id} = req.params;
@@ -84,3 +87,56 @@ exports.addRestaurantReview = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+
+exports.searchRestaurants = async (req, res) => {
+    const { name, category, area_code, maxDistance } = req.body;
+    const userId = req.user.userId;
+
+    try {
+        const [user, candidates] = await Promise.all([
+            userModel.getUserById(userId),
+            restaurantModel.searchRestaurants({ name, category, area_code })
+        ]);
+
+        if (!user || !user.geo_lat || !user.geo_lng) {
+            return res.status(400).json({
+                error: 'Please add a location to your user profile in order to search for restaurants.'
+            });
+        }
+
+        const userLat = parseFloat(user.geo_lat);
+        const userLng = parseFloat(user.geo_lng);
+
+        const userMaxDist = maxDistance ? parseFloat(maxDistance) : Infinity;
+
+        const results = candidates
+            .map(r => {
+                const distKm = calculateDistance(
+                    userLat, userLng,
+                    parseFloat(r.geo_lat), parseFloat(r.geo_lng)
+                );
+                return { ...r, distance_km: distKm };
+            })
+            .filter(r => {
+                const insideDeliveryRadius = r.distance_km <= r.delivery_radius;
+                const insideUserMaxDist = r.distance_km <= userMaxDist;
+
+                return insideDeliveryRadius && insideUserMaxDist;
+            })
+            .map(r => {
+                const timeMin = Math.round(15 + (r.distance_km * 10));
+                return {
+                    ...r,
+                    distance_km: parseFloat(r.distance_km.toFixed(2)),
+                    estimated_time_min: timeMin
+                };
+            })
+            .sort((a, b) => a.distance_km - b.distance_km);
+
+        res.status(200).json(results);
+
+    } catch (err) {
+        console.error('Search Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

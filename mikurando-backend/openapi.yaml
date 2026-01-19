@@ -437,16 +437,11 @@ paths:
           schema:
             type: string
           description: Filter by restaurant type
-        - name: lat
+        - name: maxDistance
           in: query
           schema:
             type: number
-          description: User latitude (for distance calculation)
-        - name: lng
-          in: query
-          schema:
-            type: number
-          description: User longitude (for distance calculation)
+          description: Max distance from user
       responses:
         '200':
           description: Success

@@ -79,6 +79,27 @@ const getDishesByIds = `
     WHERE dish_id = ANY($1::int[])
 `;
 
+const searchRestaurants = `
+    SELECT 
+        restaurant_id, 
+        restaurant_name, 
+        description, 
+        address, 
+        min_order_value, 
+        delivery_radius,
+        service_fee,
+        restaurant_image,
+        geo_lat, 
+        geo_lng, 
+        is_active, 
+        category
+    FROM "Restaurant"
+    WHERE 
+        is_active = TRUE
+        AND ($1::text IS NULL OR LOWER(restaurant_name) LIKE LOWER('%' || $1 || '%'))
+        AND ($2::text IS NULL OR LOWER(category) = LOWER($2))
+        AND ($3::text IS NULL OR area_code = $3)
+`;
 
 module.exports = {
     getRestaurantDetailsById,
@@ -86,5 +107,6 @@ module.exports = {
     getRestaurantNameById,
     addRestaurantReview,
     getDishNameById,
-    getDishesByIds
+    getDishesByIds,
+    searchRestaurants
 };

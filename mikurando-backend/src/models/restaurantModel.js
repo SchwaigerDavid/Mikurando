@@ -32,11 +32,24 @@ const getDishesByIds = async (dishIds) => {
     return result.rows;
 }
 
+const searchRestaurants = async (filters) => {
+    const { name, category, area_code } = filters;
+
+    const result = await db.query(queries.searchRestaurants, [
+        name || null,
+        category || null,
+        area_code || null
+    ]);
+
+    return result.rows;
+};
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
     getRestaurantNameById,
     addRestaurantReview,
     getDishNameById,
-    getDishesByIds
+    getDishesByIds,
+    searchRestaurants
 };
