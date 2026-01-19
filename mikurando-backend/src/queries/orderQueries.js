@@ -73,11 +73,62 @@ const getOrderDetailsById = `
     WHERE o.order_id = $1 AND o.user_id = $2; 
 `;
 
+const getOrdersByRestaurantId = `
+    WITH OrderItems AS (
+        SELECT
+            oi.order_id,
+            json_agg(json_build_object(
+                    'dish_id', oi.dish_id,
+                    'name', d.name,
+                    'quantity', oi.quantity,
+                    'price', oi.price
+                     )) as items_data
+        FROM "Ordered_Items" oi
+                 JOIN "Dish" d ON oi.dish_id = d.dish_id
+        GROUP BY oi.order_id
+    )
+    SELECT
+        o.order_id,
+        o.status,
+        o.total_price,
+        o.service_fee,
+        o.created_at,
+        o.delivery_address,
+        o.delivery_lat,
+        o.delivery_lng,
+        o.estimated_delivery_time,
+        COALESCE(i.items_data, '[]'::json) as items
+    FROM "Order" o
+             LEFT JOIN OrderItems i ON o.order_id = i.order_id
+             JOIN "Restaurant" r ON o.restaurant_id = r.restaurant_id
+    WHERE o.restaurant_id = $1  AND r.owner_id = $2
+    ORDER BY o.created_at DESC
+`;
+
+const getOrderStatus = `
+    SELECT o.status 
+    FROM "Order" o
+    JOIN "Restaurant" r ON o.restaurant_id = r.restaurant_id
+    WHERE o.order_id = $1 
+      AND o.restaurant_id = $2
+      AND r.owner_id = $3
+`;
+
+const updateOrderStatus = `
+    UPDATE "Order"
+    SET status = $1
+    WHERE order_id = $2
+    RETURNING order_id, status
+`;
+
 module.exports = {
     createNewOrder,
     addOrderItems,
     addVouchersToOrder,
     getOrdersByUserId,
-    getOrderDetailsById
+    getOrderDetailsById,
+    getOrdersByRestaurantId,
+    getOrderStatus,
+    updateOrderStatus
 }
 

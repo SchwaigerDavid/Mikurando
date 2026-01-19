@@ -1,19 +1,22 @@
 const validateIdParameter = (req, res, next) => {
-    const idRaw =
-        req.params.id ??
-        req.params.userId ??
-        req.params.voucherId ??
-        req.params.restaurantId ??
-        req.params.orderId;
+    for (const [key, value] of Object.entries(req.params)) {
 
-    const idInt = parseInt(String(idRaw), 10);
+        if (key === 'id' || key.endsWith('Id') || key.endsWith('_id')) {
 
-    if (isNaN(idInt) || idInt <= 0) {
-        return res.status(400).json({ error: 'Invalid ID supplied.' });
+            const idInt = parseInt(value, 10);
+
+            if (isNaN(idInt) || idInt <= 0) {
+                return res.status(400).json({
+                    error: `Invalid ID supplied for parameter '${key}'. Expected a positive integer.`
+                });
+            }
+        }
     }
 
     next();
-}
+};
+
+module.exports = { validateIdParameter };
 
 module.exports = {
     validateIdParameter

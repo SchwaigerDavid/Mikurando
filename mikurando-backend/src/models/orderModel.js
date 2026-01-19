@@ -65,8 +65,27 @@ const getOrderDetails = async (orderId, userId) => {
     return result.rows[0].result;
 };
 
+const getOrdersByRestaurantId = async (restaurantId, ownerId) => {
+    const result = await db.query(queries.getOrdersByRestaurantId, [restaurantId, ownerId]);
+    return result.rows;
+}
+
+const getOrderStatus = async (orderId, restaurantId, ownerId) => {
+    const result = await db.query(queries.getOrderStatus, [orderId, restaurantId, ownerId]);
+    return result.rows[0];
+};
+
+const updateOrderStatus = async (orderId, newStatus) => {
+    const result = await db.query(queries.updateOrderStatus, [newStatus, orderId]);
+    return result.rows[0];
+};
+
+
 module.exports = {
     createNewOrder,
     getOrdersByUserId,
-    getOrderDetails
+    getOrderDetails,
+    getOrdersByRestaurantId,
+    getOrderStatus,
+    updateOrderStatus
 };

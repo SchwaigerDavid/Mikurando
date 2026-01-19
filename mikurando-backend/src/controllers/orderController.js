@@ -203,3 +203,70 @@ exports.getOrderDetails = async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 }
+
+exports.getRestaurantOrders = async (req, res) => {
+    const { id } = req.params;
+    const ownerId = req.user.userId;
+    const rId = parseInt(id, 10);
+
+    try {
+        const orders = await orderModel.getOrdersByRestaurantId(rId, ownerId);
+
+        res.status(200).json(orders);
+
+    } catch (err) {
+        console.error('Get Orders Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
+exports.updateStatus = async (req, res) => {
+    const {restaurantId, orderId} = req.params;
+    const ownerId = req.user.userId;
+    const rId = parseInt(restaurantId, 10);
+    const oId = parseInt(orderId, 10);
+    let { status } = req.body;
+    const newStatus = status;
+
+    const allowedTransitions = {
+        'PLACED':     ['ACCEPTED', 'DECLINED'],
+        'ACCEPTED':   ['PREPARING', 'CANCELED'],
+        'PREPARING':  ['READY', 'CANCELED'],
+        'READY':      ['DISPATCHED', 'CANCELED'],
+        'DISPATCHED': ['DELIVERED'],
+        'DELIVERED':  [],
+        'DECLINED':   [],
+        'CANCELED':   []
+    };
+
+    try {
+        const currentOrder = await orderModel.getOrderStatus(oId, rId, ownerId);
+
+        if (!currentOrder) {
+            return res.status(404).json({error: 'Order not found or access denied.'});
+        }
+
+        const currentStatus = currentOrder.status;
+
+        const allowedNextSteps = allowedTransitions[currentStatus];
+
+        if (!allowedNextSteps || !allowedNextSteps.includes(newStatus)) {
+            return res.status(400).json({
+                error: `Invalid status transition. Cannot go from ${currentStatus} to ${newStatus}.}`
+            });
+        }
+
+        const updatedOrder = await orderModel.updateOrderStatus(oId, newStatus);
+
+        res.status(200).json({
+            message: 'Status updated successfully',
+            order_id: updatedOrder.order_id,
+            old_status: currentStatus,
+            new_status: updatedOrder.status
+        });
+    } catch (err) {
+        console.error('Update Status Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
