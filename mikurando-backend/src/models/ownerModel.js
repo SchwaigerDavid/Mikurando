@@ -9,13 +9,13 @@ const getRestaurantsByOwnerId = async (userId) => {
 
 const createRestaurant = async (ownerId, data) => {
     const {
-        owner_id, restaurant_name, description, address, area_code, customer_notes,
+        restaurant_name, description, address, area_code, customer_notes,
         min_order_value, delivery_radius, category, geo_lat, geo_lng,
         image_data, service_fee
     } = data;
 
     const result = await db.query(queries.createRestaurant, [
-        owner_id, restaurant_name, description, address, area_code, customer_notes || "",
+        ownerId, restaurant_name, description, address, area_code, customer_notes || "",
         min_order_value, delivery_radius, category, geo_lat, geo_lng,
         image_data, service_fee
     ]);
@@ -23,7 +23,13 @@ const createRestaurant = async (ownerId, data) => {
     return result.rows[0];
 }
 
+const getRestaurantDetails = async (ownerId, restaurantId) => {
+    const result = await db.query(queries.getRestaurantDetails, [ownerId, restaurantId]);
+    return result.rows[0];
+}
+
 module.exports = {
     getRestaurantsByOwnerId,
-    createRestaurant
+    createRestaurant,
+    getRestaurantDetails
 }

@@ -4,7 +4,6 @@ const router = express.Router();
 // Middleware & Controller
 const ownerController= require('../controllers/ownerController');
 const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
-const restaurantMiddleware = require('../middleware/restaurantMiddleware');
 const requestParameterValidationMiddleware = require('../middleware/requestParameterValidationMiddleware')
 const ownerMiddleware = require('../middleware/ownerMiddleware');
 
@@ -20,6 +19,13 @@ router.post('',
     JWTAuthentificationMiddleware.requireOwner,
     ownerMiddleware.checkRestaurantCreation,
     ownerController.createRestaurant
+)
+
+router.get('/:id',
+    requestParameterValidationMiddleware.validateIdParameter,
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    ownerController.getRestaurantDetails
 )
 
 // Exports

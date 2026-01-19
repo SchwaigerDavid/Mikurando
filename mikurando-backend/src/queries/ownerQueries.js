@@ -25,7 +25,26 @@ const createRestaurant = `
     RETURNING *;
 `
 
+const getRestaurantDetails = `
+    SELECT 
+        restaurant_id,
+        restaurant_name,
+        description,
+        address,
+        min_order_value,
+        delivery_radius,
+        restaurant_image as image_data,
+        geo_lat,
+        geo_lng,
+        is_active,
+        category
+    FROM "Restaurant"
+    WHERE owner_id = $1
+    AND restaurant_id = $2
+`
+
 module.exports = {
     getRestaurantsByOwnerId,
-    createRestaurant
+    createRestaurant,
+    getRestaurantDetails
 }

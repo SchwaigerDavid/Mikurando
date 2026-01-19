@@ -40,3 +40,33 @@ exports.createRestaurant = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+exports.getRestaurantDetails = async (req, res) => {
+    const ownerId = req.user.userId;
+    const restaurantId = req.params.id;
+    const restaurantIdInt = parseInt(req.params.id);
+
+
+    try {
+        const restaurantDetails = await ownerModel.getRestaurantDetails(ownerId, restaurantIdInt);
+
+        if (!restaurantDetails) {
+            return res.status(404).json({error: 'No restaurant found'});
+        }
+
+        if (/coffee/i.test(restaurantDetails.restaurant_name)) {
+            if (Math.random() < 0.1) {
+                return res.status(418).json({
+                    error: "I'm a teapot",
+                    message: "This restaurant refuses to brew coffee because it is, in fact, a teapot."
+                });
+            }
+        }
+
+        return res.status(200).send({message: "Success", data: restaurantDetails});
+
+    } catch (err) {
+        console.error('Get restaurant details owner Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
