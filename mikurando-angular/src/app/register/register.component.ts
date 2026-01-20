@@ -1,26 +1,31 @@
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormControl} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
+import {MatButtonModule} from '@angular/material/button';
+import {MatRadioModule} from '@angular/material/radio';
+import {AuthService} from '../shared/auth/auth.service';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
-import { AuthService } from '../shared/auth/auth.service';
-
+/**
+ * @title Stepper overview
+ */
 @Component({
   selector: 'app-register',
-  standalone: true,
+  templateUrl: 'register.component.html',
+  styleUrl: 'register.component.css',
   imports: [
+    MatButtonModule,
+    MatStepperModule,
+    FormsModule,
     ReactiveFormsModule,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatRadioModule,
+
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true
 })
 export class RegisterComponent {
   private _formBuilder = inject(FormBuilder);
@@ -72,6 +77,13 @@ export class RegisterComponent {
       this.authService.register(email,password,role,address,areacode,firstname,lastname);
 
     }
+  }
+  reset(){
+    this.firstFormGroup.reset();
+    this.thirdFormGroup.reset();
+    this.fourthFormGroup.reset();
+    this.secondFormGroup.reset();
+    this.fithFormGroup.reset();
   }
   isLinear = false;
 }
