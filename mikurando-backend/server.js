@@ -6,16 +6,29 @@ const cors = require('cors');
 const authentificationRoutes = require('./src/routes/authentificationRoutes');
 const restaurantRoutes = require('./src/routes/restaurantRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const orderRoutes = require('./src/routes/orderRoutes');
+const adminRoutes = require('./src/routes/adminRoutes');
+const ownerRoutes = require('./src/routes/ownerRoutes');
 
 const app = express();  // Create Express Application
 
-app.use(cors());  // Allow incoming Requests to come from different Origins (Use CORS for the app)
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  }),
+); // Allow incoming Requests to come from different Origins (Use CORS for the app
 app.use(express.json()); // Allow JSON bodies in requests -> look at API spec
 
 
 app.use('/auth', authentificationRoutes); // Registers Authentification Routes
 app.use('/restaurant', restaurantRoutes);
 app.use('/user', userRoutes);
+app.use('/orders', orderRoutes);
+app.use('/admin', adminRoutes);
+app.use('/owner/restaurants', ownerRoutes);
 
 
 

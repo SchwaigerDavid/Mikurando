@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
+const userEventModel = require('../models/userEventModel');
 
 exports.register = async (req, res) => {
     const {
@@ -52,6 +53,7 @@ exports.login = async (req, res) => {
             return res.status(403).json({error: 'Login Failed, Account is banned.'})
         }
 
+        await userEventModel.recordEvent(user.user_id, 'LOGIN');
 
         // Login Successful, create JWT
         const jwt_token = jwt.sign(

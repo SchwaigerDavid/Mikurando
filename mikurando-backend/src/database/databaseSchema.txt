@@ -17,10 +17,11 @@ Table User {
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
   is_active boolean [not null, default: true]
+  warnings integer [not null, default: 0]
 }
 
 Table Restaurant {
-  restaurant_id interger [primary key, increment]
+  restaurant_id integer [primary key, increment]
   owner_id integer [ref: - User.user_id]
   restaurant_name text [not null]
   description text [not null]
@@ -28,13 +29,15 @@ Table Restaurant {
   area_code text [not null]
   approved boolean [not null]
   is_active boolean [not null]
+  application_status restaurant_application_status [not null, default: 'PENDING']
   customer_notes text
   min_order_value numeric(8,2) [not null, default: 0]
+  service_fee numeric(8,2) [not null, default: 0]
   delivery_radius numeric(5,2) [not null]
   category text
   geo_lat numeric(9,6)
   geo_lng numeric(9,6)
-  restaurant_image
+  restaurant_image bytea
 }
 
 Table OpenHours {
@@ -51,6 +54,7 @@ Table Order{
   restaurant_id integer [ref: > Restaurant.restaurant_id]
   status order_status [not null]
   created_at timestamp [not null]
+  estimated_delivery_time timestamp
   total_price numeric(8,2) [not null, default: 0]
   service_fee numeric(8,2)
   delivery_address text [not null]
@@ -105,7 +109,25 @@ Table Used_Vouchers{
   voucher_id integer [ref: > Voucher.voucher_id]
 }
 
+Table User_Event {
+  id integer [primary key, increment]
+  user_id integer [ref: > User.user_id]
+  event_type user_event_type [not null]
+  created_at timestamptz [not null]
+}
 
+// Admin / Global Settings
+Table Global_Settings {
+  id integer [primary key]
+  default_service_fee numeric(8,2) [not null, default: 0]
+}
+
+// Admin / Delivery Zones
+Table Delivery_Zone {
+  id integer [primary key, increment]
+  zone_name text [not null]
+  max_radius_km numeric(5,2)
+}
 
 Enum order_status {
   PLACED
@@ -132,4 +154,15 @@ Enum role {
   CUSTOMER
   OWNER
   MANAGER
+}
+
+Enum restaurant_application_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+Enum user_event_type {
+  LOGIN
+  PROFILE_UPDATE
 }

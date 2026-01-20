@@ -1,31 +1,26 @@
 import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormControl} from '@angular/forms';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatStepperModule} from '@angular/material/stepper';
-import {MatButtonModule} from '@angular/material/button';
-import {MatRadioModule} from '@angular/material/radio';
-import {AuthService} from '../shared/auth/auth.service';
 
-/**
- * @title Stepper overview
- */
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
+import { AuthService } from '../shared/auth/auth.service';
+
 @Component({
   selector: 'app-register',
-  templateUrl: 'register.component.html',
-  styleUrl: 'register.component.css',
+  standalone: true,
   imports: [
-    MatButtonModule,
-    MatStepperModule,
-    FormsModule,
     ReactiveFormsModule,
+    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatRadioModule,
-
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true
 })
 export class RegisterComponent {
   private _formBuilder = inject(FormBuilder);

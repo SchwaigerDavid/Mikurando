@@ -3,6 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { delay, Observable, of, throwError } from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -18,17 +20,22 @@ export class AuthService {
   constructor(private http: HttpClient) {
   }
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+
+  private readonly apiBaseUrl = 'http://localhost:3000';
+
   private get isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
 
   private readonly storageKeyToken = 'mikurando_token';
-  private readonly storageKeyUser = 'mikurando_user';
+  private readonly storageKeyUser = 'user';
+  private readonly storageKeyWarningsShown = 'mikurando_warnings_shown_for';
 
   readonly token = signal<string | null>(this.readToken());
   readonly email = signal<string>(this.reademail());
-
   readonly user = signal<AuthUser | null>(this.readStructuredUser());
+  readonly userName = signal<string>(this.readUserName());
 
   private readToken(): string | null {
     if (!this.isBrowser) return null;
@@ -42,8 +49,13 @@ export class AuthService {
 
   private readStructuredUser(): AuthUser | null {
     if (!this.isBrowser) return null;
-    const raw = localStorage.getItem('user');
+    const raw = localStorage.getItem(this.storageKeyUser);
     return raw ? (JSON.parse(raw) as AuthUser) : null;
+  }
+
+  private readUserName(): string {
+    if (!this.isBrowser) return '';
+    return this.readStructuredUser()?.email ?? '';
   }
 
   isLoggedIn(): boolean {
@@ -111,7 +123,7 @@ export class AuthService {
   setSession(token: string, user: AuthUser) {
     if (this.isBrowser) {
       localStorage.setItem(this.storageKeyToken, token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem(this.storageKeyUser, JSON.stringify(user));
     }
 
     this.token.set(token);
@@ -123,7 +135,6 @@ export class AuthService {
     if (this.isBrowser) {
       localStorage.removeItem(this.storageKeyToken);
       localStorage.removeItem(this.storageKeyUser);
-      localStorage.removeItem('user');
     }
 
     this.token.set(null);
@@ -133,5 +144,29 @@ export class AuthService {
 
   hasRole(role: Role): boolean {
     return this.user()?.role === role;
+  }
+
+  getWarningsCount(): number {
+    return Number(this.user()?.warnings ?? 0);
+  }
+
+  shouldShowWarningsPopup(): boolean {
+    if (!this.isBrowser) return false;
+    const u = this.user();
+    if (!u) return false;
+
+    const current = Number(u.warnings ?? 0);
+    if (current <= 0) return false;
+
+    const key = `${u.userId}:${current}`;
+    return localStorage.getItem(this.storageKeyWarningsShown) !== key;
+  }
+
+  markWarningsPopupShown() {
+    if (!this.isBrowser) return;
+    const u = this.user();
+    if (!u) return;
+    const current = Number(u.warnings ?? 0);
+    localStorage.setItem(this.storageKeyWarningsShown, `${u.userId}:${current}`);
   }
 }

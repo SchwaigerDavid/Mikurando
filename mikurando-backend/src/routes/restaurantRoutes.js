@@ -27,5 +27,10 @@ router.post('/:id/reviews',
     restaurantController.addRestaurantReview // check restaurant (and dish) exists + business logic
 )
 
+router.get('',
+    JWTAuthentificationMiddleware.authenticateToken,
+    restaurantController.searchRestaurants
+)
+
 // Exports
 module.exports = router;

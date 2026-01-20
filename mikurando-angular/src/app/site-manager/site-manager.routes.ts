@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { SmShellComponent } from './ui/sm-shell.component';
 
-export const siteManagerRoutes: Routes = [
+export const adminRoutes: Routes = [
   {
     path: '',
     component: SmShellComponent,

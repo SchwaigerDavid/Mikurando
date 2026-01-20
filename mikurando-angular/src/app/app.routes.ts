@@ -17,9 +17,9 @@ export const routes: Routes = [
   },
 
   {
-    path: 'site-manager',
+    path: 'admin',
     canActivate: [authGuard],
-    loadChildren: () => import('./site-manager').then((m) => m.siteManagerRoutes),
+    loadChildren: () => import('./site-manager').then((m) => m.adminRoutes),
   },
   {
     path:'graph',

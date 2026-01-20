@@ -37,10 +37,11 @@ const getRestaurantDetailsById = `
                    'description', r.description,
                    'address', r.address,
                    'min_order_value', r.min_order_value,
+                   'service_fee', r.service_fee,
                    'delivery_radius', r.delivery_radius,
                    'image_data', r.restaurant_image,
                    'geo_lat', r.geo_lat,
-                   'geo_long', r.geo_lng,
+                   'geo_lng', r.geo_lng,
                    'is_active', r.is_active,
                    'category', r.category,
                    'opening_hours', COALESCE(oo.opening_hours, '[]'::json),
@@ -72,10 +73,133 @@ const addRestaurantReview = `
 
 const getDishNameById = 'SELECT name FROM "Dish" WHERE dish_id = $1 AND restaurant_id = $2';
 
+const getDishesByIds = `
+    SELECT dish_id, name, price, avaliable, restaurant_id 
+    FROM "Dish" 
+    WHERE dish_id = ANY($1::int[])
+`;
+
+const searchRestaurants = `
+    SELECT 
+        restaurant_id, 
+        restaurant_name, 
+        description, 
+        address, 
+        min_order_value, 
+        delivery_radius,
+        service_fee,
+        restaurant_image,
+        geo_lat, 
+        geo_lng, 
+        is_active, 
+        category
+    FROM "Restaurant"
+    WHERE 
+        is_active = TRUE
+        AND ($1::text IS NULL OR LOWER(restaurant_name) LIKE LOWER('%' || $1 || '%'))
+        AND ($2::text IS NULL OR LOWER(category) = LOWER($2))
+        AND ($3::text IS NULL OR area_code = $3)
+`;
+
+const checkRestaurantOwnership = `
+    SELECT restaurant_id FROM "Restaurant" 
+    WHERE restaurant_id = $1 AND owner_id = $2
+`;
+
+const deleteOpeningHours = `
+    DELETE FROM "OpenHours" 
+    WHERE restaurant_id = $1
+`;
+
+const insertOpeningHours = `
+    INSERT INTO "OpenHours" (restaurant_id, day, open_from, open_till)
+    SELECT $1, unnest($2::week_day[]), unnest($3::time[]), unnest($4::time[])
+`;
+
+const addDish = `
+    INSERT INTO "Dish" 
+    (restaurant_id, category_id, name, description, price, avaliable, dish_bytea)
+    VALUES ($1, $2, $3, $4, $5, $6, decode($7, 'base64')) 
+    RETURNING 
+        dish_id, name, description, price, avaliable, category_id, 
+        encode(dish_bytea, 'base64') as image_data 
+`;
+
+const updateDish = `
+    UPDATE "Dish"
+    SET 
+        name = $1, 
+        description = $2, 
+        price = $3, 
+        dish_bytea = $4,  
+        avaliable = $5, 
+        category_id = $6
+    FROM "Restaurant" r
+    WHERE "Dish".dish_id = $7
+      AND "Dish".restaurant_id = $8      
+      AND "Dish".restaurant_id = r.restaurant_id
+      AND r.owner_id = $9                
+    RETURNING "Dish".*
+`;
+
+const deleteDish = `
+    DELETE FROM "Dish"
+    USING "Restaurant" r
+    WHERE "Dish".dish_id = $1
+      AND "Dish".restaurant_id = $2
+      AND "Dish".restaurant_id = r.restaurant_id
+      AND r.owner_id = $3
+    RETURNING "Dish".dish_id
+`;
+
+const updateDishAvailability = `
+    UPDATE "Dish"
+    SET avaliable = $1
+    WHERE dish_id = $2 AND restaurant_id = $3
+    RETURNING dish_id, avaliable
+`;
+
+const checkCategoryBelongsToRestaurant = `
+    SELECT 1 FROM "Categories" 
+    WHERE category_id = $1 AND restaurant_id = $2
+`;
+
+const getCategories = `
+    SELECT category_id, category_name 
+    FROM "Categories" 
+    WHERE restaurant_id = $1
+    ORDER BY category_id
+`;
+
+const addCategory = `
+    INSERT INTO "Categories" (restaurant_id, category_name)
+    VALUES ($1, $2)
+    RETURNING category_id, category_name
+`;
+
+const deleteCategory = `
+    DELETE FROM "Categories"
+    WHERE category_id = $1 AND restaurant_id = $2
+    RETURNING category_id
+`;
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
     getRestaurantNameById,
     addRestaurantReview,
-    getDishNameById
+    getDishNameById,
+    getDishesByIds,
+    searchRestaurants,
+    checkRestaurantOwnership,
+    deleteOpeningHours,
+    insertOpeningHours,
+    addDish,
+    updateDish,
+    deleteDish,
+    updateDishAvailability,
+    checkCategoryBelongsToRestaurant,
+    getCategories,
+    addCategory,
+    deleteCategory
 };
