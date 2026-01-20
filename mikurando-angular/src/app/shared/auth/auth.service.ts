@@ -2,6 +2,8 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { sha256 } from 'js-sha256';
+
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -65,7 +67,51 @@ export class AuthService {
     return this.userName() || 'admin';
   }
 
+  register(email: string, password: string, role: 'CUSTOMER' | 'OWNER' | 'MANAGER', address: string, area_code: string , name: string, surname: string):any{
+    const salt = 10;
+    password = sha256(password);
+    const registerPayload = {
+      email: email,
+      password: password,
+      name: name,
+      surname: surname,
+      adress: address,
+      area_code:area_code,
+      role: role
+    };
+    console.log(registerPayload);
+    const url = `${this.apiBaseUrl}/auth/register`;
+
+    this.http.post(url, registerPayload).subscribe({next: (response) => {
+        // Wird bei Status 201 (Created) aufgerufen
+        console.log('Registrierung erfolgreich:', response);
+        alert('Konto wurde erstellt!');
+      },
+      error: (err) => {
+        // Fehlerbehandlung basierend auf dem Statuscode vom Backend
+        if (err.status === 409) {
+          // Entspricht deinem res.status(409) im Backend
+          console.error('Konflikt:', err.error.error);
+          alert('Diese E-Mail-Adresse ist bereits registriert.');
+        } else if (err.status === 500) {
+          // Entspricht deinem res.status(500) im Backend
+          console.error('Server Fehler:', err.error.error);
+          alert('Ein interner Serverfehler ist aufgetreten. Bitte später versuchen.');
+        } else {
+          // Sonstige Fehler (z.B. Netzwerkprobleme)
+          console.error('Unerwarteter Fehler:', err);
+          alert('Verbindung zum Server fehlgeschlagen.');
+        }
+        return false;
+      },
+      complete: () => {
+      return true;
+        console.log('Registrierungsprozess abgeschlossen');
+      }});
+  }
   login(email: string, password: string): Observable<LoginResponse> {
+    password = sha256(password);
+    console.log(password);
     return this.http.post<LoginResponse>(`${this.apiBaseUrl}/auth/login`, { email, password }).pipe(
       tap((resp) => {
         const u: AuthUser = {
@@ -77,20 +123,6 @@ export class AuthService {
         this.setSession(resp.token, u);
       }),
     );
-  }
-
-  register(payload: {
-    email: string;
-    password: string;
-    role: 'CUSTOMER' | 'OWNER';
-    surname: string;
-    name: string;
-    address?: string;
-    area_code?: string;
-    geo_lat?: number;
-    geo_lng?: number;
-  }): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/auth/register`, payload);
   }
 
   setSession(token: string, user: AuthUser) {
@@ -141,5 +173,9 @@ export class AuthService {
     if (!u) return;
     const current = Number(u.warnings ?? 0);
     localStorage.setItem(this.storageKeyWarningsShown, `${u.userId}:${current}`);
+  }
+
+  getOwnerOrders( restaurantID:string){
+    const url = `${this.apiBaseUrl}/owner/${restaurantID}/orders/`;
   }
 }

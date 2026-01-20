@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import {DashboardOwner} from './owner/dashboard/dashboard';
 import { authGuard } from './shared/auth/auth.guard';
 
 export const routes: Routes = [
@@ -8,6 +9,7 @@ export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  {path :'ownerdash',component: DashboardOwner},
 
   {
     path: 'home',
