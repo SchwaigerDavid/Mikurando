@@ -1,73 +1,89 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {FormBuilder, Validators, FormsModule, ReactiveFormsModule, FormControl} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatStepperModule} from '@angular/material/stepper';
+import {MatButtonModule} from '@angular/material/button';
+import {MatRadioModule} from '@angular/material/radio';
+import {AuthService} from '../shared/auth/auth.service';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
-import { AuthService } from '../shared/auth/auth.service';
-
+/**
+ * @title Stepper overview
+ */
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatSnackBarModule,
-  ],
   templateUrl: 'register.component.html',
   styleUrl: 'register.component.css',
+  imports: [
+    MatButtonModule,
+    MatStepperModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatRadioModule,
+
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true
 })
 export class RegisterComponent {
-  private fb = inject(FormBuilder);
-  private auth = inject(AuthService);
-  private snack = inject(MatSnackBar);
-  private router = inject(Router);
-
-  form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    role: ['CUSTOMER' as 'CUSTOMER' | 'OWNER', [Validators.required]],
-    name: ['', [Validators.required]],
-    surname: ['', [Validators.required]],
+  private _formBuilder = inject(FormBuilder);
+  constructor(private authService: AuthService){}
+  firstFormGroup = this._formBuilder.group({
+    firstname: ['', Validators.required],
+    lastname: ['', Validators.required],
+    email: ['', Validators.required],
+  });
+  secondFormGroup = this._formBuilder.group({
     address: [''],
-    area_code: [''],
+    areacode: [''],
+  });
+  thirdFormGroup = this._formBuilder.group({
+    password: ['', Validators.required],
+  });
+  fourthFormGroup = this._formBuilder.group({
+    role: ['', Validators.required],
+  });
+  fithFormGroup = this._formBuilder.group({
+    profilePic: [File, Validators.required],
   });
 
-  submit() {
-    if (this.form.invalid) return;
-
-    const v = this.form.getRawValue();
-
-    (this.auth as any)
-      .register({
-        email: String(v.email),
-        password: String(v.password),
-        role: v.role!,
-        name: String(v.name),
-        surname: String(v.surname),
-        address: v.address ? String(v.address) : undefined,
-        area_code: v.area_code ? String(v.area_code) : undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.snack.open('Registration successful. Please log in.', 'Close', { duration: 2500 });
-          this.router.navigateByUrl('/login');
-        },
-        error: (err: any) => {
-          const msg = err?.error?.error ?? 'Registration failed.';
-          this.snack.open(msg, 'Close', { duration: 4000, panelClass: ['error-snackbar'] });
-        },
-      });
+  hide = signal(true);
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
   }
+  fileName = '';
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.fileName = file.name;
+      // Hier kannst du den Wert in dein fithFormGroup schreiben
+      this.fithFormGroup.patchValue({ profilePic: File });
+    }
+  }
+  done(){
+    if (
+      this.firstFormGroup.valid &&
+      this.thirdFormGroup.valid &&
+      this.fourthFormGroup.valid
+    ) {
+      const{firstname,lastname,email}=this.firstFormGroup.value;
+      const{address,areacode}=this.secondFormGroup.value;
+      const{password}=this.thirdFormGroup.value;
+      const {role}=this.fourthFormGroup.value;
+      this.authService.register(email,password,role,address,areacode,firstname,lastname);
+
+    }
+  }
+  reset(){
+    this.firstFormGroup.reset();
+    this.thirdFormGroup.reset();
+    this.fourthFormGroup.reset();
+    this.secondFormGroup.reset();
+    this.fithFormGroup.reset();
+  }
+  isLinear = false;
 }

@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../shared/auth/auth.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
 @Component({
   selector: 'app-login',
   standalone: true,

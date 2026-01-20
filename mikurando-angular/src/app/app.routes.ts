@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { authGuard } from './shared/auth/auth.guard';
+import {GraphComponent} from './owner/analytic/graphs/graph.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -19,6 +20,10 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard],
     loadChildren: () => import('./site-manager').then((m) => m.adminRoutes),
+  },
+  {
+    path:'graph',
+    component: GraphComponent
   },
 
   { path: '**', redirectTo: '/login' },
