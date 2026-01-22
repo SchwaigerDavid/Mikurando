@@ -9,6 +9,7 @@ import {FormGroup, FormControl} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { validOpeningHoursValidator } from './opening-hours.validator';
 
@@ -25,11 +26,14 @@ import { validOpeningHoursValidator } from './opening-hours.validator';
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
+    MatChipsModule,
   ],
   templateUrl: './restaurant-profile.html',
   styleUrl: './restaurant-profile.scss',
 })
 export class RestaurantProfile {
+
+  availableZones = ['A1', 'A2', 'B1', 'B2', 'C1'];
 
   openingHours = new FormArray(
     ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(day =>
@@ -50,6 +54,9 @@ export class RestaurantProfile {
     customer_notes: new FormControl(''),
     min_order_value: new FormControl('', Validators.required),
     category: new FormControl('', Validators.required),
+
+    deliveryZones: new FormControl<string[]>([], Validators.required),
+
     openingHours: this.openingHours,
   });
 
@@ -90,6 +97,10 @@ export class RestaurantProfile {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
+  get deliveryZones() {
+    return this.profileForm.get('deliveryZones');
+  }
+
   payload: any = null;
 
   save() {
@@ -109,6 +120,8 @@ export class RestaurantProfile {
       customerNotes: this.customerNotes?.value,
       minOrderValue: this.minOrderValue?.value,
       category: this.category?.value,
+
+      deliveryZones: this.deliveryZones?.value,
 
       approved: false,
       is_active: false,

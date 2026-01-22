@@ -46,6 +46,29 @@
           Speichern
         </button>
 
+        <mat-card style="margin-top:16px;" style="margin-bottom:16px;">
+          <mat-card-header>
+            <mat-card-title>Delivery Zones</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <mat-chip-listbox
+              formControlName="deliveryZones"
+              multiple
+            >
+              <mat-chip-option
+                *ngFor="let zone of availableZones"
+                [value]="zone"
+              >
+                {{ zone }}
+              </mat-chip-option>
+            </mat-chip-listbox>
+
+          </mat-card-content>
+        </mat-card>
+
+
+
         <div formArrayName="openingHours">
           <div
             *ngFor="let day of openingHours.controls; let i = index"
