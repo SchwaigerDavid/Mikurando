@@ -1,3 +1,4 @@
+.idea/
 .idea/sqldialects.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/dataSources.xml
@@ -6,3 +7,6 @@ mikurando-angular/.env
 .DS_Store
 mikurando-backend/.env
 /mikurando-backend/node_modules
+/mikurando-angular/node_modules
+/mikurando-angular/.angular
+/mikurando-angular/.vscode
