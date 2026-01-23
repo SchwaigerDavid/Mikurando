@@ -1,4 +1,49 @@
-<mat-card *ngFor="let order of orders">
-  <mat-card-title>Order #{{ order.id }}</mat-card-title>
-  <p>Status: {{ order.status }}</p>
-</mat-card>
+<div style="display:grid; gap:16px;">
+  <mat-card *ngFor="let order of orders">
+
+    <mat-card-header>
+      <mat-card-title>
+        Order #{{ order.id }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ order.customerName }} · {{ order.createdAt | date:'short' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <ul>
+        <li *ngFor="let item of order.items">
+          {{ item.qty }} × {{ item.name }}
+        </li>
+      </ul>
+
+      <strong>Total: {{ order.total | currency:'EUR' }}</strong>
+
+      <div style="margin-top:8px;">
+        <mat-chip>{{ order.status }}</mat-chip>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions *ngIf="order.status === 'NEW'">
+      <button mat-flat-button color="primary" (click)="accept(order)">
+        Accept
+      </button>
+      <button mat-stroked-button color="warn" (click)="reject(order)">
+        Reject
+      </button>
+    </mat-card-actions>
+
+    <mat-card-actions *ngIf="order.status === 'PREPARING'">
+      <button mat-flat-button color="accent" (click)="markReady(order)">
+        Mark as Ready
+      </button>
+    </mat-card-actions>
+
+    <mat-card-actions *ngIf="order.status === 'READY'">
+      <button mat-flat-button color="primary" (click)="dispatch(order)">
+        Dispatched
+      </button>
+    </mat-card-actions>
+
+  </mat-card>
+</div>
