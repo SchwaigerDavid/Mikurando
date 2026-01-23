@@ -1,6 +1,38 @@
-<mat-grid-list cols="2" rowHeight="2:1">
-  <mat-grid-tile><h1>Total-Orders: 1.000.200</h1></mat-grid-tile>
-  <mat-grid-tile><h1>Revenue: 1.234,23€</h1></mat-grid-tile>
-  <mat-grid-tile><app-graph [salesData] = "currentSales"></app-graph></mat-grid-tile>
-  <mat-grid-tile><order-tables [dataSource] ="orders"></order-tables></mat-grid-tile>
+<mat-grid-list cols="2" rowHeight="100px">
+  <mat-grid-tile><h1>{{restaurantName}}</h1></mat-grid-tile>
+  <mat-grid-tile><img [src]="fullImageSource" alt="Mein Restaurant Bild"></mat-grid-tile>
+  <mat-grid-tile><h1>Total-Orders: {{orderCount}}</h1></mat-grid-tile>
+  <mat-grid-tile><h1>Revenue: {{revenue}}€</h1></mat-grid-tile>
+
+</mat-grid-list>
+<mat-grid-list cols="2" rowHeight="500px">
+<mat-grid-tile>
+  <div class="tile-content">
+    <div class="header-row">
+    <section>
+  <mat-button-toggle-group
+    #timeGroup="matButtonToggleGroup"
+    [value]="selectedValue"
+    (change)="onValueChange(timeGroup.value)"
+    name="TimeChanger">
+    <mat-button-toggle value="W">W</mat-button-toggle>
+    <mat-button-toggle value="M">M</mat-button-toggle>
+    <mat-button-toggle value="6M">6M</mat-button-toggle>
+    <mat-button-toggle value="Y">Y</mat-button-toggle>
+  </mat-button-toggle-group>
+</section>
+      <section>
+        <mat-button-toggle-group
+          #salesGroup="matButtonToggleGroup"
+          [value]="selectedSale"
+          (change)="onSalesChange(salesGroup.value)"
+          name="Order">
+          <mat-button-toggle value="Sales">Sales</mat-button-toggle>
+          <mat-button-toggle value="Orders">Orders</mat-button-toggle>
+        </mat-button-toggle-group>
+      </section>
+    </div>
+    <div class="graph-container">
+      <app-graph [salesData] = "currentSales" [labelData]="currentLabels"></app-graph></div></div></mat-grid-tile>
+<mat-grid-tile><order-tables [dataSource] ="orders"></order-tables></mat-grid-tile>
 </mat-grid-list>

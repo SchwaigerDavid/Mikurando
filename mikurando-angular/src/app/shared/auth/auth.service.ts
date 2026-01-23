@@ -1,6 +1,6 @@
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { sha256 } from 'js-sha256';
 
@@ -111,7 +111,6 @@ export class AuthService {
   }
   login(email: string, password: string): Observable<LoginResponse> {
     password = sha256(password);
-    console.log(password);
     return this.http.post<LoginResponse>(`${this.apiBaseUrl}/auth/login`, { email, password }).pipe(
       tap((resp) => {
         const u: AuthUser = {
@@ -177,5 +176,17 @@ export class AuthService {
 
   getOwnerOrders( restaurantID:string){
     const url = `${this.apiBaseUrl}/owner/${restaurantID}/orders/`;
+  }
+  getOwnerRestaurant(){
+    const url =`${this.apiBaseUrl}/owner/restaurants`;
+    const token = this.readToken();
+    console.log(token);
+    const headers= new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.http.get(url,{headers}).subscribe({
+      next: (response) => {
+        return response;
+      },error: (err) => console.error(err)
+    });
+    return null;
   }
 }

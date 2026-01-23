@@ -1,0 +1,31 @@
+.tile-content {
+  display: flex;
+  flex-direction: column; // Elemente untereinander
+  width: 100%;
+  height: 90%;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between; // Text links, Buttons rechts
+  align-items: center;
+  margin-bottom: 0px;
+  width: 100%;
+}
+
+.graph-container {
+  flex-grow: 1; // Der Graph nimmt den restlichen Platz ein
+  width: 100%;
+  min-height: 0; // Wichtig für Flexbox-Stabilität
+}
+::ng-deep .mat-grid-tile-content {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important; // Richtet den Inhalt oben aus
+  align-items: stretch !important;       // Lässt die Tabelle die volle Breite nutzen
+}
+order-tables {
+  padding-top: 10px;
+}
