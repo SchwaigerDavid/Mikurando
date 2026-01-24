@@ -1,0 +1,68 @@
+.map-container {
+  height: 300px;
+  width: 300px;
+  // border: 5px solid red;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+  background-color: #eee;
+}
+
+::ng-deep {
+  // Popup Restaurant
+  .popup-card {
+    text-align: center;
+    min-width: 150px;
+    padding: var(--space-s);
+  }
+
+  // Popup title
+  .popup-card__title {
+    margin: 0 0 var(--space-xs) 0;
+    font-weight: 500;
+  }
+
+  // Popup info Text
+  .popup-card__info {
+    margin: 0 0 var(--space-m) 0;
+    color: #666;
+  }
+
+  .popup-card__meta {
+    font-size: 0.85em;
+    color: #888;
+  }
+
+
+  .popup-card__action {
+    background-color: var(--primary-color, #3f51b5);
+    color: white;
+
+
+    padding: var(--space-s) var(--space-m);
+
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+
+
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+
+    transition: background-color 0.2s;
+
+    &:hover {
+      filter: brightness(90%);
+    }
+
+    &:active {
+      box-shadow: none;
+    }
+  }
+}

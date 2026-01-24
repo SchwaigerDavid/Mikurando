@@ -4,6 +4,7 @@ const userModel = require('../models/userModel');
 const userEventModel = require('../models/userEventModel');
 
 exports.register = async (req, res) => {
+    console.log(req.body);
     const {
         email, password, role, surname, name, address, area_code, profile_picture, geo_lat, geo_lng
     } = req.body;
@@ -34,6 +35,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+    console.log(req.body);
     const {email, password} = req.body;
 
     try {

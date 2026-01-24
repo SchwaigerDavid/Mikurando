@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import {DashboardOwner} from './owner/dashboard/dashboard';
+import {MapComponent} from './components/map/map'
 import { authGuard } from './shared/auth/auth.guard';
 
 export const routes: Routes = [
@@ -21,6 +22,12 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard],
     loadChildren: () => import('./site-manager').then((m) => m.adminRoutes),
+  },
+
+  {
+    path: 'map',
+    component: MapComponent,
+    canActivate: [authGuard]
   },
 
   { path: '**', redirectTo: '/login' },
