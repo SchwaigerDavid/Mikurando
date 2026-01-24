@@ -1,0 +1,104 @@
+<div class="profile-wrapper">
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <mat-card-title>Restaurant Profil</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="profileForm">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Restaurant Name</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <input matInput formControlName="description">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Adress</mat-label>
+          <input matInput formControlName="adress">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Area Code</mat-label>
+          <input matInput formControlName="area_code">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Customer notes</mat-label>
+          <input matInput formControlName="customer_notes">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Minimum order value</mat-label>
+          <input matInput formControlName="min_order_value">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category</mat-label>
+          <input matInput formControlName="category">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" [disabled]="!profileForm.valid" (click)="save()">
+          Speichern
+        </button>
+
+        <mat-card style="margin-top:16px;" style="margin-bottom:16px;">
+          <mat-card-header>
+            <mat-card-title>Delivery Zones</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <mat-chip-listbox
+              formControlName="deliveryZones"
+              multiple
+            >
+              <mat-chip-option
+                *ngFor="let zone of availableZones"
+                [value]="zone"
+              >
+                {{ zone }}
+              </mat-chip-option>
+            </mat-chip-listbox>
+
+          </mat-card-content>
+        </mat-card>
+
+
+
+        <div formArrayName="openingHours">
+          <div
+            *ngFor="let day of openingHours.controls; let i = index"
+            [formGroupName]="i"
+            class="day-row"
+          >
+            <strong>{{ day.value.day }}</strong>
+
+            <mat-form-field>
+              <input matInput type="time" formControlName="open">
+            </mat-form-field>
+
+            <span>–</span>
+
+            <mat-form-field>
+              <input matInput type="time" formControlName="close">
+            </mat-form-field>
+
+            <mat-checkbox formControlName="closed">
+              geschlossen
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div *ngIf="payload">
+          <h3>Payload Preview</h3>
+          <pre>{{ payload | json }}</pre>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
