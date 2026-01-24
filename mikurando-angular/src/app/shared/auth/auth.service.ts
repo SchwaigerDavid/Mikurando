@@ -1,10 +1,8 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { delay, Observable, of, throwError } from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import { genSaltSync, hashSync } from "bcrypt-ts";
+import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -28,8 +26,6 @@ type LoginResponse = {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiURL = 'http://localhost:3000/auth';
-  constructor(private http: HttpClient) {
-  }
   private readonly platformId = inject(PLATFORM_ID);
   private readonly http = inject(HttpClient);
 
@@ -78,9 +74,7 @@ export class AuthService {
   }
 
   register(email: string | null | undefined, password: string | null | undefined, role: string | null | undefined, adress: string | null | undefined, areacode: string | null | undefined, name: string | null | undefined, surname: string | null | undefined){
-    const salt = genSaltSync(10);
-    const password_hash = hashSync(<string>password, salt);
-    const registerData={email,password_hash,name,surname,adress,role};
+    const registerData={email,password,name,surname,adress,role};
     const url = `${this.apiURL}/register`;
 
     this.http.post(url, registerData).subscribe({next: (response) => {
@@ -108,27 +102,32 @@ export class AuthService {
         console.log('Registrierungsprozess abgeschlossen');
       }});
   }
-  login(email: string, password: string): Observable<{token: string; user: Record<string, object> }> {
-    const loginData = {email, password};
-    const url = `${this.apiURL}/login`
-    return this.http.post<{token: string; user: Record<string, object> }>(url, loginData) ;
-    /*
-      if (email === 'admin' && password === 'admin') {
-        return of({ token: 'fake-jwt-token', user: 'Admin' }).pipe(delay(400));
-      }
+  login(email: string, password: string): Observable<LoginResponse> {
+    const url = `${this.apiURL}/login`;
 
-      return throwError(() => new Error('Invalid email or password')).pipe(delay(400));
-      */
+    return this.http.post<LoginResponse>(url, { email, password }).pipe(
+      tap(res => {
+        const user: AuthUser = {
+          userId: res.user.user_id,
+          email: res.user.email,
+          role: res.user.role,
+          warnings: res.user.warnings ?? 0,
+        };
+
+        this.setSession(res.token, user);
+      })
+    );
   }
 
-  persistSession(token: string, user: Record<string, object>) {
+
+  persistSession(token: string, user: AuthUser) {
     if (this.isBrowser) {
       localStorage.setItem(this.storageKeyToken, token);
       localStorage.setItem(this.storageKeyUser, JSON.stringify(user));
     }
 
     this.token.set(token);
-    this.email.set(JSON.stringify(user)); // JSON.parse(this.email);
+    this.email.set(user.email);
   }
 
   setSession(token: string, user: AuthUser) {
