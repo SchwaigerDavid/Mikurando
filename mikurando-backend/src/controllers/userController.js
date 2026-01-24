@@ -1,5 +1,6 @@
 const userModel = require('../models/userModel');
 const userEventModel = require('../models/userEventModel');
+const { geocodeAddress } = require('../utils/locationUtils');
 
 exports.getUserProfile = async (req, res) => {
     const user_id = req.user.userId;
@@ -34,13 +35,28 @@ exports.updateProfile = async (req, res) => {
         name,
         address,
         area_code,
-        geo_lat,
-        geo_lng,
         profile_picture_data
     } = req.body;
+    let {
+        geo_lat, geo_lng
+    } = req.body
 
-    if (!email || !surname || !name) {
-        return res.status(400).json({ error: 'Email, Vorname und Nachname sind Pflichtfelder.' });
+    const hasCoordinates = geo_lat && geo_lng && (geo_lat !== 0 || geo_lng !== 0);
+
+    if (address && !hasCoordinates) {
+        console.log(`Geocoding address: ${address} ${area_code || ''}`);
+
+        const searchString = `${address}, ${area_code || ''}`;
+        const coords = await geocodeAddress(searchString);
+
+        if (coords) {
+            geo_lat = coords.lat;
+            geo_lng = coords.lng;
+            console.log('Found coordinates:', coords);
+        } else {
+            console.warn('Address not found via Geocoding');
+            return res.status(400).json({ error: 'Address not found via Geocoding.' });
+        }
     }
 
     try {

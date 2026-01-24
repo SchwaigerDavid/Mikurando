@@ -1,8 +1,8 @@
 const validateRegistration = (req, res, next) => {
-    const { email, password, name, surname, role } = req.body;
+    const { email, password, name, surname, role, address } = req.body;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if (!email || !password || !role || !surname || !name) {
+    if (!email || !password || !role || !surname || !name || !address ) {
         return res.status(400).json({error: 'Please fill out all mandatory fields.'});
     }
 
@@ -33,7 +33,7 @@ const validateUpdate = (req, res, next) => {
         profile_picture_data
     } = req.body;
 
-    if (!email || !surname || !name || !address || !area_code || !geo_lat || !geo_lng || !profile_picture_data) {
+    if (!email || !surname || !name || !address || !area_code || !profile_picture_data) {
         return res.status(400).json({ error: 'Please fill out all fields.' });
     }
 

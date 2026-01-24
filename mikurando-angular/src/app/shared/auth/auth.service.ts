@@ -75,7 +75,7 @@ export class AuthService {
       password: password,
       name: name,
       surname: surname,
-      adress: address,
+      address: address,
       area_code:area_code,
       role: role
     };
