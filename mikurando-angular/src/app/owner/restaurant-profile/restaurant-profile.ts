@@ -10,8 +10,10 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { HttpClient } from '@angular/common/http';
 
 import { validOpeningHoursValidator } from './opening-hours.validator';
+
 
 
 @Component({
@@ -32,6 +34,8 @@ import { validOpeningHoursValidator } from './opening-hours.validator';
   styleUrl: './restaurant-profile.scss',
 })
 export class RestaurantProfile {
+
+  constructor(private http: HttpClient) {}
 
   availableZones = ['A1', 'A2', 'B1', 'B2', 'C1'];
 
@@ -113,25 +117,30 @@ export class RestaurantProfile {
       this.minOrderValue.setValue('0');
     }
 
-    this.payload = {
-      name: this.name?.value,
+    const payload = {
+      restaurant_name: this.name?.value,
       description: this.description?.value,
-      adress: this.adress?.value,
-      customerNotes: this.customerNotes?.value,
-      minOrderValue: this.minOrderValue?.value,
+      address: this.adress?.value,
+      area_code: this.areaCode?.value,
+      customer_notes: this.customerNotes?.value,
+      min_order_value: Number(this.minOrderValue?.value),
       category: this.category?.value,
 
-      deliveryZones: this.deliveryZones?.value,
+      delivery_zones: this.deliveryZones?.value,
+      opening_hours: this.profileForm.value.openingHours,
 
-      approved: false,
-      is_active: false,
       owner_id: this.owner_id,
-      restaurant_id: this.restaurant_id,
-
-      openingHours: this.profileForm.value.openingHours,
     };
 
-    console.log('Payload:', this.payload);
+    this.payload = payload; //nur für preview
+
+
+    console.log('Payload:', payload);
+
+    this.http.post<any>('http://localhost:3000/restaurants', payload).subscribe({
+      next: (res: any) => console.log('Restaurant gespeichert', res),
+      error: (err: any) => console.error('Fehler:', err),
+    });
   }
 }
 

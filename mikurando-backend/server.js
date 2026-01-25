@@ -24,7 +24,7 @@ app.use(express.json()); // Allow JSON bodies in requests -> look at API spec
 
 
 app.use('/auth', authentificationRoutes); // Registers Authentification Routes
-app.use('/restaurant', restaurantRoutes);
+app.use('/restaurants', restaurantRoutes);
 app.use('/user', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admin', adminRoutes);

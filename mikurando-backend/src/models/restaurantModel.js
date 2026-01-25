@@ -153,6 +153,63 @@ const deleteCategory = async (categoryId, restaurantId) => {
     return result.rows.length > 0;
 };
 
+const createRestaurant = async (data) => {
+    const result = await db.query(
+        `
+            INSERT INTO "Restaurant"
+            (owner_id, restaurant_name, description, address, area_code,
+             customer_notes, min_order_value, delivery_radius, category,
+             approved, is_active, application_status)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,false,false,'PENDING')
+                RETURNING *
+        `,
+        [
+            data.owner_id,
+            data.restaurant_name || '',
+            data.description || '',
+            data.address || '',
+            data.area_code || '',
+            data.customer_notes || '',
+            data.min_order_value || 0,
+            data.delivery_radius || 5.0,
+            data.category || ''
+        ]
+    );
+
+    return result.rows[0];
+};
+
+const setOpeningHours = async (restaurantId, openingHours) => {
+    // Mapping von deutschen Abkürzungen zu ENUM-Werten
+    const dayMapping = {
+        'Mo': 'MONDAY',
+        'Di': 'TUESDAY',
+        'Mi': 'WEDNESDAY',
+        'Do': 'THURSDAY',
+        'Fr': 'FRIDAY',
+        'Sa': 'SATURDAY',
+        'So': 'SUNDAY'
+    };
+
+    for (const h of openingHours) {
+        if (h.closed) continue;
+
+        const dayEnum = dayMapping[h.day];
+        if (!dayEnum) {
+            throw new Error(`Invalid day abbreviation: ${h.day}`);
+        }
+
+        await db.query(
+            `
+                INSERT INTO "OpenHours"
+                    (restaurant_id, day, open_from, open_till)
+                VALUES ($1,$2,$3,$4)
+            `,
+            [restaurantId, dayEnum, h.open, h.close]
+        );
+    }
+};
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,
@@ -170,5 +227,7 @@ module.exports = {
     verifyCategoryOwnership,
     getCategories,
     addCategory,
-    deleteCategory
+    deleteCategory,
+    createRestaurant,
+    setOpeningHours
 };

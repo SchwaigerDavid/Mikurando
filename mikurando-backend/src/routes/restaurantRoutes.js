@@ -7,6 +7,17 @@ const requestParameterValidationMiddleware = require('../middleware/requestParam
 const JWTAuthentificationMiddleware = require('../middleware/JWTMiddleware')
 const restaurantMiddleware = require('../middleware/restaurantMiddleware');
 
+router.use((req, res, next) => {
+    console.log('thomas Restaurant route hit:', req.method, req.originalUrl);
+    next();
+});
+
+
+router.post('/',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    restaurantController.createRestaurant
+);
 
 // Routes
 router.get('/:id',
