@@ -1,4 +1,8 @@
 <div class="dashboard-wrapper">
+  <div class="owner-actions">
+    <a mat-flat-button color="primary" routerLink="/owner/forum-moderation">Forum Moderation</a>
+  </div>
+
   @if (restaurants && restaurants.length > 0) {
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
       @for (restaurant of restaurants; track $index; let i = $index) {
