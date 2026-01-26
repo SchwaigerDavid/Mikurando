@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
         <mat-card-content>
           <p>Mainmenu: choose a module.</p>
           <div class="actions">
-            <a mat-flat-button color="primary" routerLink="/admin">To Admin</a>
+            <a mat-flat-button color="primary" routerLink="/admin">To Site-Manager</a>
           </div>
         </mat-card-content>
       </mat-card>
