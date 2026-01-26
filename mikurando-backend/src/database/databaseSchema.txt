@@ -116,6 +116,24 @@ Table User_Event {
   created_at timestamptz [not null]
 }
 
+Table Forum_Thread {
+  thread_id integer [primary key, increment]
+  restaurant_id integer [ref: > Restaurant.restaurant_id]
+  user_id integer [ref: > User.user_id]
+  title text [not null]
+  created_at timestamptz [not null]
+  is_closed boolean [not null, default: false]
+}
+
+Table Forum_Post {
+  post_id integer [primary key, increment]
+  thread_id integer [ref: > Forum_Thread.thread_id]
+  user_id integer [ref: > User.user_id]
+  content text [not null]
+  created_at timestamptz [not null]
+  is_approved boolean [not null, default: true]
+}
+
 // Admin / Global Settings
 Table Global_Settings {
   id integer [primary key]
