@@ -17,7 +17,7 @@ export class App {
 
 
   isLoggedIn = computed(() => this.auth.isLoggedIn());
-  userName = computed(() => this.auth.getUserName());
+  userName = computed(() => this.auth.getemail());
   // @ts-ignore
   getHome():string{
    const user:string = localStorage.getItem("user") ?? "";

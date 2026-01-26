@@ -4,6 +4,8 @@ import { RegisterComponent } from './register/register.component';
 import {Tabs} from './owner/tabs/tabs';
 import {NotFound} from './not-found/not-found';
 import {MapComponent} from './components/map/map'
+import { RestaurantProfile } from './owner/restaurant-profile/restaurant-profile';
+import { OrderReception } from './owner/order-reception/order-reception';
 import { authGuard } from './shared/auth/auth.guard';
 
 export const routes: Routes = [
@@ -23,6 +25,24 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [authGuard],
     loadChildren: () => import('./site-manager').then((m) => m.adminRoutes),
+  },
+
+  {
+    path: 'owner/restaurant-profile',
+    component: RestaurantProfile
+  },
+  {
+    path: 'owner/orders',
+    component: OrderReception
+  },
+
+  {
+    path: 'owner/restaurant-profile',
+    component: RestaurantProfile
+  },
+  {
+    path: 'owner/orders',
+    component: OrderReception
   },
 
   {

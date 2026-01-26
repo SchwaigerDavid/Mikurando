@@ -1,3 +1,7 @@
+CREATE DATABASE "Mikurando";
+
+\c Mikurando;
+
 CREATE TYPE "order_status" AS ENUM (
   'PLACED',
   'ACCEPTED',

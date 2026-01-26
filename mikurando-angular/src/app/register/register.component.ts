@@ -15,6 +15,8 @@ import { RouterLink, Router } from '@angular/router';
   selector: 'app-register',
   templateUrl: 'register.component.html',
   styleUrl: 'register.component.css',
+  templateUrl: 'register.component.html',
+  styleUrl: 'register.component.css',
   imports: [
     MatButtonModule,
     MatStepperModule,
@@ -25,7 +27,11 @@ import { RouterLink, Router } from '@angular/router';
     MatInputModule,
     MatRadioModule,
 
+    MatRadioModule,
+
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true
 })
@@ -39,6 +45,7 @@ export class RegisterComponent {
   });
   secondFormGroup = this._formBuilder.group({
     address: [''],
+    areacode: [''],
     areacode: [''],
   });
   thirdFormGroup = this._formBuilder.group({
