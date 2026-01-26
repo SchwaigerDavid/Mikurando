@@ -124,12 +124,12 @@ export class SmDashboardPage {
     this.loading.show();
     this.api.getDashboard().subscribe({
       next: (d) => this.dashboard.set(d),
-      error: () => this.notify.error('Failed to load dashboard'),
+      error: () => this.notify.error('restricted'),
     });
 
     this.api.getPendingRestaurants().subscribe({
       next: (rows) => this.pendingState.set(rows ?? []),
-      error: () => this.notify.error('Failed to load pending restaurants'),
+      error: () => this.pendingState.set([]),
       complete: () => this.loading.hide(),
     });
   }
