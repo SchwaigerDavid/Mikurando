@@ -9,6 +9,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const ownerRoutes = require('./src/routes/ownerRoutes');
+const forumRoutes = require('./src/routes/forumRoutes');
 
 const app = express();  // Create Express Application
 
@@ -29,6 +30,7 @@ app.use('/user', userRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admin', adminRoutes);
 app.use('/owner/restaurants', ownerRoutes);
+app.use('/forum', forumRoutes);
 
 
 
