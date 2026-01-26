@@ -179,14 +179,38 @@ export class AuthService {
   }
   getOwnerRestaurant(){
     const url =`${this.apiBaseUrl}/owner/restaurants`;
-    const token = this.readToken();
-    console.log(token);
-    const headers= new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    this.http.get(url,{headers}).subscribe({
-      next: (response) => {
-        return response;
-      },error: (err) => console.error(err)
-    });
-    return null;
+    /*let restaurants = [
+      {
+        "restaurant_id": 0,
+        "restaurant_name": "Orlando",
+        "description": "Bla",
+        "address": "string",
+        "min_order_value": 20,
+        "delivery_radius": 20,
+        "service_fee": 10,
+        "image_data": "string",
+        "geo_lat": 45,
+        "geo_lng": 50,
+        "is_active": true,
+        "category": "Borger"
+      },
+      {
+        "restaurant_id": 1,
+        "restaurant_name": "ThomasBudde",
+        "description": "Blo",
+        "address": "string",
+        "min_order_value": 200,
+        "delivery_radius": 120,
+        "service_fee": 50,
+        "image_data": "string",
+        "geo_lat": 47,
+        "geo_lng": 12,
+        "is_active": true,
+        "category": "ProteinShakes"
+      }
+    ]*/
+    return this.http.get<any>(url);
+
+
   }
 }

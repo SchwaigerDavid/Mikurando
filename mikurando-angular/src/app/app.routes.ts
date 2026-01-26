@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import {DashboardOwner} from './owner/dashboard/dashboard';
+import {Tabs} from './owner/tabs/tabs';
+import {NotFound} from './not-found/not-found';
 import {MapComponent} from './components/map/map'
 import { authGuard } from './shared/auth/auth.guard';
 
@@ -10,8 +11,8 @@ export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  {path :'ownerdash',component: DashboardOwner},
-
+  {path :'ownerdash',component: Tabs},
+  {path:'notfound',component: NotFound},
   {
     path: 'home',
     canActivate: [authGuard],
@@ -30,5 +31,5 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  { path: '**', redirectTo: '/login' },
+  { path: '**', redirectTo: '/notfound' },
 ];
