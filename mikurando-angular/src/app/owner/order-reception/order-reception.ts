@@ -1,19 +1,34 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
+import { inject } from '@angular/core';
+import { Subject, interval } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
-type OrderStatus = 'NEW' | 'REJECTED' | 'PREPARING' | 'READY' | 'DISPATCHED';
 
-interface Order {
-  id: number;
-  customerName: string;
-  items: { name: string; qty: number }[];
-  total: number;
+type OrderStatus =
+  | 'PLACED'
+  | 'ACCEPTED'
+  | 'DECLINED'
+  | 'PREPARING'
+  | 'READY'
+  | 'DISPATCHED'
+  | 'DELIVERED'
+  | 'CANCELED';
+
+type IncomingOrder = {
+  order_id: number;
+  user_id: number;
   status: OrderStatus;
-  createdAt: string;
-}
+  created_at: string;
+  total_price: number;
+  delivery_address: string;
+};
 
 @Component({
   selector: 'app-order-reception',
@@ -27,42 +42,43 @@ interface Order {
   templateUrl: './order-reception.html',
   styleUrl: './order-reception.scss',
 })
-export class OrderReception {
+export class OrderReception implements OnInit {
 
-  orders: Order[] = [
-    {
-      id: 101,
-      customerName: 'Marcel Davis',
-      items: [
-        { name: 'Pizza Margherita', qty: 1 },
-        { name: 'Cola', qty: 2 }],
-      total: 24.90,
-      status: 'NEW',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 102,
-      customerName: 'Jasper Blatt',
-      items: [{ name: 'Pasta Carbonara', qty: 1 }],
-      total: 18.50,
-      status: 'PREPARING',
-      createdAt: new Date().toISOString(),
-    },
+  private destroy$ = new Subject<void>();
+  private platformId = inject(PLATFORM_ID);
+
+  testOrders = [
+    { order_id: 0, customer: 'Testkunde', status: 'NEW', total: 24.9 }
   ];
 
-  accept(order: Order) {
-    order.status = 'PREPARING';
+  orders: IncomingOrder[] = [];
+
+  restaurantId = 5; // später aus Auth / Route
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return; // KEIN HTTP / Polling auf dem Server
+    }
+
+    interval(5000)
+      .pipe(
+        takeUntil(this.destroy$),
+        switchMap(() =>
+          this.http.get<IncomingOrder[]>(
+            `http://localhost:3000/orders/restaurant/${this.restaurantId}`
+          )
+        )
+      )
+      .subscribe({
+        next: orders => this.orders = orders,
+        error: err => console.error('Order polling failed', err)
+      });
   }
 
-  reject(order: Order) {
-    order.status = 'REJECTED';
-  }
-
-  markReady(order: Order) {
-    order.status = 'READY';
-  }
-
-  dispatch(order: Order) {
-    order.status = 'DISPATCHED';
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -364,6 +364,30 @@ exports.createRestaurant = async (req, res) => {
     }
 };
 
+exports.getIncomingOrders = async (req, res) => {
+    const restaurantId = parseInt(req.params.id, 10);
+    const ownerId = req.user.userId;
+
+    try {
+        // Sicherheitcheck:gehört Restaurant dem Owner?
+        const isOwner = await restaurantModel.checkOwnership(restaurantId, ownerId);
+        if (!isOwner) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const orders = await restaurantModel.getOrdersByRestaurant(restaurantId);
+
+        res.status(200).json({
+            message: 'Success',
+            data: orders
+        });
+
+    } catch (err) {
+        console.error('Get Orders Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 
 exports.deleteCategory = async (req, res) => {
     const { restaurantId, categoryId } = req.params;

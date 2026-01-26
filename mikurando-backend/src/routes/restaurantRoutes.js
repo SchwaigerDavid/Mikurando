@@ -38,6 +38,12 @@ router.post('/:id/reviews',
     restaurantController.addRestaurantReview // check restaurant (and dish) exists + business logic
 )
 
+router.get('/:id/orders', (req, res, next) => {
+    console.log('Orders requested for restaurant', req.params.id, 'by user', req.user);
+    next();
+});
+
+
 router.get('',
     JWTAuthentificationMiddleware.authenticateToken,
     restaurantController.searchRestaurants

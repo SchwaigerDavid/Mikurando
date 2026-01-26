@@ -210,6 +210,26 @@ const setOpeningHours = async (restaurantId, openingHours) => {
     }
 };
 
+exports.getOrdersByRestaurant = async (restaurantId) => {
+    const query = `
+    SELECT
+      order_id,
+      user_id,
+      status,
+      created_at,
+      estimated_delivery_time,
+      total_price,
+      service_fee,
+      delivery_address
+    FROM "Order"
+    WHERE restaurant_id = $1
+    ORDER BY created_at DESC
+  `;
+
+    const { rows } = await db.query(query, [restaurantId]);
+    return rows;
+};
+
 module.exports = {
     getRestaurantDetailsById,
     getRestaurantReviews,

@@ -28,5 +28,13 @@ router.get('/:id',
     orderController.getOrderDetails
 )
 
+router.get(
+    '/restaurant/:id',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    requestParameterValidationMiddleware.validateIdParameter,
+    orderController.getRestaurantOrders
+);
+
 // Exports
 module.exports = router;
