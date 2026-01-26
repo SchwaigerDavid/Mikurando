@@ -1,0 +1,41 @@
+<div class="dashboard-wrapper">
+  <mat-grid-list cols="2" rowHeight="150px">
+    <mat-grid-tile><h1>{{restaurantName}}</h1></mat-grid-tile>
+    <mat-grid-tile>
+      <img [src]="img" alt="Restaurant Logo" *ngIf="img"
+           style="width: 100%; height: 100%; object-fit: contain;">
+    </mat-grid-tile>
+    <mat-grid-tile><h1>Total-Orders: {{orderCount}}</h1></mat-grid-tile>
+    <mat-grid-tile><h1>Revenue: {{revenue}}€</h1></mat-grid-tile>
+  </mat-grid-list>
+
+  <mat-grid-list cols="2" rowHeight="500px">
+    <mat-grid-tile>
+      <div class="tile-content" style="width: 100%; height: 100%; padding: 20px;">
+        <div class="header-row" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <mat-button-toggle-group #timeGroup="matButtonToggleGroup" [value]="selectedValue" (change)="onValueChange(timeGroup.value)">
+            <mat-button-toggle value="W">W</mat-button-toggle>
+            <mat-button-toggle value="M">M</mat-button-toggle>
+            <mat-button-toggle value="6M">6M</mat-button-toggle>
+            <mat-button-toggle value="Y">Y</mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <mat-button-toggle-group #salesGroup="matButtonToggleGroup" [value]="selectedSale" (change)="onSalesChange(salesGroup.value)">
+            <mat-button-toggle value="Sales">Sales</mat-button-toggle>
+            <mat-button-toggle value="Orders">Orders</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <mat-card class="chart-card" style="height: calc(100% - 60px);">
+          <mat-card-content style="height: 100%;">
+            <app-graph [salesData]="currentSales" [labelData]="currentLabels"></app-graph>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <order-tables [dataSource]="orders" style="width: 100%; height: 100%;"></order-tables>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>

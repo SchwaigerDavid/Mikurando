@@ -1,4 +1,5 @@
 const ownerModel = require("../models/ownerModel");
+const {geocodeAddress} = require("../utils/locationUtils");
 
 exports.getRestaurants = async (req, res) => {
     const userId = req.user.userId;
@@ -20,8 +21,29 @@ exports.createRestaurant = async (req, res) => {
     const {
         restaurant_name, description, address, area_code, customer_notes,
         min_order_value, delivery_radius, service_fee,
-        image_data, geo_lat, geo_lng, category
+        image_data, category
     } = req.body;
+    let {
+        geo_lat, geo_lng
+    } = req.body
+
+    const hasCoordinates = geo_lat && geo_lng && (geo_lat !== 0 || geo_lng !== 0);
+
+    if (address && !hasCoordinates) {
+        console.log(`Geocoding address: ${address} ${area_code || ''}`);
+
+        const searchString = `${address}, ${area_code || ''}`;
+        const coords = await geocodeAddress(searchString);
+
+        if (coords) {
+            geo_lat = coords.lat;
+            geo_lng = coords.lng;
+            console.log('Found coordinates:', coords);
+        } else {
+            console.warn('Address not found via Geocoding');
+            return res.status(400).json({ error: 'Address not found via Geocoding.' });
+        }
+    }
 
     try {
         const newRestaurant = await ownerModel.createRestaurant(ownerId, {
@@ -73,10 +95,32 @@ exports.getRestaurantDetails = async (req, res) => {
 
 exports.updateRestaurant = async (req, res) => {
     const { restaurant_name, description, address, area_code, customer_notes, min_order_value, delivery_radius,
-        category, geo_lat, geo_lng, image_data, service_fee } = req.body;
+        category, image_data, service_fee } = req.body;
     const ownerId = req.user.userId;
     const restaurantId = req.params.id;
     const restaurantIdInt = parseInt(req.params.id);
+
+    let {
+        geo_lat, geo_lng
+    } = req.body
+
+    const hasCoordinates = geo_lat && geo_lng && (geo_lat !== 0 || geo_lng !== 0);
+
+    if (address && !hasCoordinates) {
+        console.log(`Geocoding address: ${address} ${area_code || ''}`);
+
+        const searchString = `${address}, ${area_code || ''}`;
+        const coords = await geocodeAddress(searchString);
+
+        if (coords) {
+            geo_lat = coords.lat;
+            geo_lng = coords.lng;
+            console.log('Found coordinates:', coords);
+        } else {
+            console.warn('Address not found via Geocoding');
+            return res.status(400).json({ error: 'Address not found via Geocoding.' });
+        }
+    }
 
     try {
         const updatedRestaurant = await ownerModel.updateRestaurant(ownerId, restaurantIdInt, {restaurant_name, description, address, area_code, customer_notes, min_order_value, delivery_radius,

@@ -2,11 +2,16 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
 const userEventModel = require('../models/userEventModel');
+const {geocodeAddress} = require("../utils/locationUtils");
 
 exports.register = async (req, res) => {
+    console.log(req.body);
     const {
-        email, password, role, surname, name, address, area_code, profile_picture, geo_lat, geo_lng
+        email, password, role, surname, name, address, area_code, profile_picture,
     } = req.body;
+    let {
+        geo_lat, geo_lng
+    } = req.body
 
     try {
         const existingUser = await userModel.getUserIdByEmail(email);
@@ -17,6 +22,25 @@ exports.register = async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
+
+
+        const hasCoordinates = geo_lat && geo_lng && (geo_lat !== 0 || geo_lng !== 0);
+
+        if (address && !hasCoordinates) {
+            console.log(`Geocoding address: ${address} ${area_code || ''}`);
+
+            const searchString = `${address}, ${area_code || ''}`;
+            const coords = await geocodeAddress(searchString);
+
+            if (coords) {
+                geo_lat = coords.lat;
+                geo_lng = coords.lng;
+                console.log('Found coordinates:', coords);
+            } else {
+                console.warn('Address not found via Geocoding');
+                return res.status(400).json({ error: 'Address not found via Geocoding.' });
+            }
+        }
 
         const new_user = await userModel.createUser({
             email, password_hash, role, surname, name, address, area_code, profile_picture, geo_lat, geo_lng
@@ -34,6 +58,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+    console.log(req.body);
     const {email, password} = req.body;
 
     try {

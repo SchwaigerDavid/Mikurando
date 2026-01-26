@@ -15,9 +15,23 @@ export class App {
   private auth = inject(AuthService);
   private router = inject(Router);
 
+
   isLoggedIn = computed(() => this.auth.isLoggedIn());
   userName = computed(() => this.auth.getemail());
-
+  // @ts-ignore
+  getHome():string{
+   const user:string = localStorage.getItem("user") ?? "";
+   const myUser=JSON.parse(user);
+   if(myUser.role=="OWNER"){
+     return "ownerdash";
+   }
+   else if(myUser.role=="CUSTOMER") {
+     return "home";
+   }
+   else if(myUser.role=="MANAGER"){
+     return "home"
+   }
+  }
   logout() {
     this.auth.logout();
     this.router.navigateByUrl('/login');

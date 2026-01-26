@@ -5,9 +5,7 @@
   <title>register</title>
 </head>
 <body>
-<button matButton="elevated" (click)="isLinear = !isLinear" id="toggle-linear">
-  {{!isLinear ? 'Enable linear mode' : 'Disable linear mode'}}
-</button>
+
 <mat-stepper [linear]="isLinear" orientation="vertical" #stepper>
   <mat-step [stepControl]="firstFormGroup">
     <form [formGroup]="firstFormGroup">
@@ -35,12 +33,12 @@
     <form [formGroup]="secondFormGroup">
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input matInput formControlName="adress" placeholder="Ex. 1 Main St, New York, NY">
+        <input matInput formControlName="address" placeholder="Ex. 1 Main St, New York, NY">
       </mat-form-field>
       <br>
       <mat-form-field>
         <mat-label>Area code</mat-label>
-        <input matInput formControlName="areaCode" placeholder="9020">
+        <input matInput formControlName="areacode" placeholder="9020">
       </mat-form-field>
       <div>
         <button matButton matStepperPrevious>Back</button>
@@ -69,16 +67,16 @@
     <form [formGroup]="fourthFormGroup">
       <mat-radio-group formControlName="role" aria-label="Roles " required>
         <br>
-        <mat-radio-button value="1">Customer</mat-radio-button>
+        <mat-radio-button value="CUSTOMER">Customer</mat-radio-button>
         <br>
-        <mat-radio-button value="2">Owner</mat-radio-button>
+        <mat-radio-button value="OWNER">Owner</mat-radio-button>
         <br>
-        <mat-radio-button value="3">Cite Manager</mat-radio-button>
+        <mat-radio-button value="MANAGER">Cite Manager</mat-radio-button>
       </mat-radio-group>
       <div>
         <button matButton matStepperPrevious>Back</button>
         <button matButton matStepperNext>Next</button>
-    </div>
+      </div>
     </form>
   </mat-step>
   <mat-step [stepControl]="fithFormGroup" label="Profile Picture">

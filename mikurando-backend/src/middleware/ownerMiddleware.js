@@ -10,6 +10,10 @@ const checkRestaurantCreationAndUpdate = (req, res, next) => {
         return res.status(400).send({message: "Please fill out all the required fields"});
     }
 
+    if (isNaN(delivery_radius)){
+        return res.status(400).send({message: "Delivery Radius must be a number (in km)"});
+    }
+
     next();
 }
 

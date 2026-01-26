@@ -1,8 +1,9 @@
 <nav class="topnav">
   <div class="brand">Mikurando</div>
   <div class="links">
-    <a routerLink="/home" *ngIf="isLoggedIn()">Home</a>
+    <a [routerLink]= getHome() *ngIf="isLoggedIn()">Home</a>
     <a routerLink="/admin" *ngIf="isLoggedIn()">Admin</a>
+    <a routerLink="/map" *ngIf="isLoggedIn()">Map</a>
 
     <span class="user" *ngIf="isLoggedIn()">{{ userName() }}</span>
 

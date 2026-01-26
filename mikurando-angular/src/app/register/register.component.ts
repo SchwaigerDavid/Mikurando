@@ -6,6 +6,7 @@ import {MatStepperModule} from '@angular/material/stepper';
 import {MatButtonModule} from '@angular/material/button';
 import {MatRadioModule} from '@angular/material/radio';
 import {AuthService} from '../shared/auth/auth.service';
+import { RouterLink, Router } from '@angular/router';
 
 /**
  * @title Stepper overview
@@ -18,9 +19,12 @@ import {AuthService} from '../shared/auth/auth.service';
     MatButtonModule,
     MatStepperModule,
     FormsModule,
+    RouterLink,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatRadioModule,
+
     MatRadioModule,
 
   ],
@@ -29,7 +33,7 @@ import {AuthService} from '../shared/auth/auth.service';
 })
 export class RegisterComponent {
   private _formBuilder = inject(FormBuilder);
-  constructor(private authService: AuthService){}
+  constructor(private authService: AuthService, private router: Router){}
   firstFormGroup = this._formBuilder.group({
     firstname: ['', Validators.required],
     lastname: ['', Validators.required],
@@ -70,13 +74,34 @@ export class RegisterComponent {
       this.thirdFormGroup.valid &&
       this.fourthFormGroup.valid
     ) {
-      const{firstname,lastname,email}=this.firstFormGroup.value;
-      const{address,areacode}=this.secondFormGroup.value;
-      const{password}=this.thirdFormGroup.value;
-      const {role}=this.fourthFormGroup.value;
-      this.authService.register(email,password,role,address,areacode,firstname,lastname);
+      const email = this.firstFormGroup.value.email ?? '';
+      const firstname = this.firstFormGroup.value.firstname ?? '';
+      const lastname = this.firstFormGroup.value.lastname ?? '';
 
+      const address = this.secondFormGroup.value.address ?? '';
+      const areacode = this.secondFormGroup.value.areacode ?? '';
+
+      const password = this.thirdFormGroup.value.password ?? '';
+      const role = (this.fourthFormGroup.value.role as 'CUSTOMER' | 'OWNER' | 'MANAGER') ?? 'CUSTOMER';
+      if(this.authService.register(email,password,role,address,areacode,firstname,lastname)) {
+        this.authService.login(email,password)
+        const User:string =localStorage.getItem("user") ?? " ";
+        const myUser:{
+          userId: number;
+          email: string;
+          role: 'CUSTOMER' | 'OWNER' | 'MANAGER';
+          warnings: number;
+        } =JSON.parse(User);
+        if(myUser.role=="CUSTOMER"){
+
+        }else if(myUser.role=="MANAGER"){
+
+        }else if(myUser.role=="OWNER"){
+          this.router.navigateByUrl('/ownerdash');
+        }
+      }
     }
+
   }
   reset(){
     this.firstFormGroup.reset();

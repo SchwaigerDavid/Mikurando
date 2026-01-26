@@ -1,0 +1,204 @@
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1a0033; /* Dunkler, cyber-mäßiger Hintergrund */
+  overflow: hidden; // Verhindert Scrollbars durch fallende Noten
+  position: relative;
+  font-family: 'Press Start 2P', cursive; /* Für Retro-Look, wenn verfügbar */
+  color: #e0e0e0;
+}
+
+.background-glitch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgba(255,0,255,0.05), rgba(0,255,255,0.05));
+  animation: glitch-bg 10s infinite alternate;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.miku-404-content {
+  position: relative;
+  z-index: 2; // Stellt sicher, dass Miku über dem Glitch ist
+  text-align: center;
+  transform: translateY(0);
+  animation: float-in 1s ease-out;
+}
+
+.text-404 {
+  font-size: 8em; // Große 404
+  font-weight: bold;
+  color: #ff00ff; /* Neon Pink */
+  text-shadow: 0 0 15px #ff00ff, 0 0 30px #00ffff; /* Neon Glühen */
+  margin-bottom: 20px;
+  animation: neon-pulse 1.5s infinite alternate;
+  letter-spacing: 10px; // Abstand zwischen den Ziffern
+}
+
+.text-404 .digit {
+  display: inline-block;
+  animation: bounce-digit 0.8s ease-out infinite alternate;
+}
+.text-404 .digit:nth-child(2) { animation-delay: 0.1s; }
+.text-404 .digit:nth-child(3) { animation-delay: 0.2s; }
+
+
+.miku-image-wrapper {
+  position: relative;
+  width: 300px; // Größe des Miku-Bildes anpassen
+  height: 300px;
+  margin: 0 auto;
+}
+
+.miku-expression {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  bottom: 0; // Passt die Position an, damit sie nicht schwebt
+  left: 50%;
+  transform: translateX(-50%);
+  animation: subtle-miku-float 8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+}
+
+.miku-speech-bubble {
+  position: absolute;
+  bottom: -150px; // Position des Sprechblasen-Textes unter Miku
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #00ffff;
+  padding: 15px 25px;
+  border-radius: 20px;
+  max-width: 400px;
+  font-size: 1.1em;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+  animation: fade-in 2s ease-out forwards;
+  animation-delay: 1s;
+  opacity: 0; // Startet unsichtbar
+}
+
+.miku-speech-bubble p {
+  margin-bottom: 10px;
+}
+
+.home-button {
+  background-color: #ff00ff; /* Neon Pink */
+  color: #1a0033;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-top: 15px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+}
+
+.home-button:hover {
+  background-color: #00ffff; /* Neon Cyan */
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.9);
+}
+
+/* Animierte Noten */
+.note {
+  position: absolute;
+  font-size: 3em;
+  color: #00ffff; // Neon Cyan
+  text-shadow: 0 0 8px #00ffff;
+  animation: fall-and-fade 10s linear infinite;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.note-1 { top: 10%; left: 15%; animation-delay: 0s; font-size: 2.5em; }
+.note-2 { top: 5%; left: 70%; animation-delay: 2s; font-size: 3.5em; color: #ff00ff; }
+.note-3 { top: 20%; left: 40%; animation-delay: 4s; font-size: 2em; }
+.note-4 { top: 0%; left: 55%; animation-delay: 6s; font-size: 4em; color: #ff00ff; }
+
+/* Animierte Partikel */
+.particle {
+  position: absolute;
+  background-color: rgba(255, 0, 255, 0.5); // Neon Pink
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: particle-explode 5s ease-out infinite;
+}
+
+.particle-1 { width: 10px; height: 10px; top: 45%; left: 48%; animation-delay: 0.5s; }
+.particle-2 { width: 8px; height: 8px; top: 50%; left: 55%; animation-delay: 1.5s; background-color: rgba(0, 255, 255, 0.5); }
+.particle-3 { width: 12px; height: 12px; top: 52%; left: 40%; animation-delay: 2.5s; }
+
+/* Keyframe-Animationen */
+@keyframes neon-pulse {
+  0% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+  100% { text-shadow: 0 0 18px #ff00ff, 0 0 35px #00ffff, 0 0 45px #00ffff; }
+}
+
+@keyframes bounce-digit {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+@keyframes fall-and-fade {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes particle-explode {
+  0% { transform: translate(0, 0) scale(0); opacity: 1; }
+  100% { transform: translate(calc(var(--rand-x) * 100vw), calc(var(--rand-y) * 100vh)) scale(1); opacity: 0; }
+}
+
+@keyframes glitch-bg {
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes float-in {
+  0% { opacity: 0; transform: translateY(50px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes subtle-miku-float {
+  0% { transform: translateX(-50%) translateY(0px); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+  100% { transform: translateX(-50%) translateY(0px); }
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 768px) {
+  .text-404 {
+    font-size: 5em;
+    letter-spacing: 5px;
+  }
+  .miku-image-wrapper {
+    width: 200px;
+    height: 200px;
+  }
+  .miku-speech-bubble {
+    font-size: 0.9em;
+    bottom: -100px;
+    max-width: 300px;
+  }
+  .home-button {
+    padding: 8px 15px;
+  }
+  .note { font-size: 1.5em; }
+}

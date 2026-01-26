@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import {Tabs} from './owner/tabs/tabs';
+import {NotFound} from './not-found/not-found';
+import {MapComponent} from './components/map/map'
 import { RestaurantProfile } from './owner/restaurant-profile/restaurant-profile';
 import { OrderReception } from './owner/order-reception/order-reception';
 import { authGuard } from './shared/auth/auth.guard';
@@ -10,7 +13,8 @@ export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
+  {path :'ownerdash',component: Tabs},
+  {path:'notfound',component: NotFound},
   {
     path: 'home',
     canActivate: [authGuard],
@@ -32,5 +36,20 @@ export const routes: Routes = [
     component: OrderReception
   },
 
-  { path: '**', redirectTo: '/login' },
+  {
+    path: 'owner/restaurant-profile',
+    component: RestaurantProfile
+  },
+  {
+    path: 'owner/orders',
+    component: OrderReception
+  },
+
+  {
+    path: 'map',
+    component: MapComponent,
+    canActivate: [authGuard]
+  },
+
+  { path: '**', redirectTo: '/notfound' },
 ];

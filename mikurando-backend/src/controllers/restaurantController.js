@@ -89,7 +89,15 @@ exports.addRestaurantReview = async (req, res) => {
 }
 
 exports.searchRestaurants = async (req, res) => {
-    const { name, category, area_code, maxDistance } = req.body;
+    let name = null;
+    let category = null;
+    let area_code = null;
+    let maxDistance = null;
+
+    if (req.body) {
+        ({ name, category, area_code, maxDistance } = req.body);
+    }
+
     const userId = req.user.userId;
 
     try {
@@ -98,7 +106,9 @@ exports.searchRestaurants = async (req, res) => {
             restaurantModel.searchRestaurants({ name, category, area_code })
         ]);
 
+        console.log(user)
         if (!user || !user.geo_lat || !user.geo_lng) {
+            console.log("No location in profile")
             return res.status(400).json({
                 error: 'Please add a location to your user profile in order to search for restaurants.'
             });
@@ -121,7 +131,7 @@ exports.searchRestaurants = async (req, res) => {
                 const insideDeliveryRadius = r.distance_km <= r.delivery_radius;
                 const insideUserMaxDist = r.distance_km <= userMaxDist;
 
-                return insideDeliveryRadius && insideUserMaxDist;
+                return /*insideDeliveryRadius &&*/ insideUserMaxDist;
             })
             .map(r => {
                 const timeMin = Math.round(15 + (r.distance_km * 10));

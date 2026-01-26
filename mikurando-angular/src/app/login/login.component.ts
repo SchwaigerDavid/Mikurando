@@ -50,8 +50,21 @@ export class LoginComponent {
           } else {
             this.snackBar.open('Access granted', 'Close', { duration: 1500 });
           }
+          const User:string =localStorage.getItem("user") ?? " ";
+          const myUser:{
+            userId: number;
+            email: string;
+            role: 'CUSTOMER' | 'OWNER' | 'MANAGER';
+            warnings: number;
+          } =JSON.parse(User);
+          if(myUser.role=="CUSTOMER"){
 
-          this.router.navigateByUrl('/home');
+          }else if(myUser.role=="MANAGER"){
+            this.router.navigateByUrl('/home');
+          }else if(myUser.role=="OWNER"){
+            this.router.navigateByUrl('/ownerdash');
+          }
+
         },
         error: () => {
           this.snackBar.open('Invalid email or password', 'Close', {

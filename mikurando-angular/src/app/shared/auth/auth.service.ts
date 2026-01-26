@@ -1,8 +1,9 @@
 import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { HttpClient,HttpHeaders } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { sha256 } from 'js-sha256';
+
 
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
@@ -72,12 +73,22 @@ export class AuthService {
   getemail(): string {
     return this.email() || 'admin';
   }
+  register(email: string, password: string, role: 'CUSTOMER' | 'OWNER' | 'MANAGER', address: string, area_code: string , name: string, surname: string):any{
+    const salt = 10;
+    password = sha256(password);
+    const registerPayload = {
+      email: email,
+      password: password,
+      name: name,
+      surname: surname,
+      address: address,
+      area_code:area_code,
+      role: role
+    };
+    console.log(registerPayload);
+    const url = `${this.apiBaseUrl}/auth/register`;
 
-  register(email: string | null | undefined, password: string | null | undefined, role: string | null | undefined, adress: string | null | undefined, areacode: string | null | undefined, name: string | null | undefined, surname: string | null | undefined){
-    const registerData={email,password,name,surname,adress,role};
-    const url = `${this.apiURL}/register`;
-
-    this.http.post(url, registerData).subscribe({next: (response) => {
+    this.http.post(url, registerPayload).subscribe({next: (response) => {
         // Wird bei Status 201 (Created) aufgerufen
         console.log('Registrierung erfolgreich:', response);
         alert('Konto wurde erstellt!');
@@ -97,24 +108,25 @@ export class AuthService {
           console.error('Unerwarteter Fehler:', err);
           alert('Verbindung zum Server fehlgeschlagen.');
         }
+        return false;
       },
       complete: () => {
+      return true;
         console.log('Registrierungsprozess abgeschlossen');
       }});
   }
   login(email: string, password: string): Observable<LoginResponse> {
-    const url = `${this.apiURL}/login`;
-
-    return this.http.post<LoginResponse>(url, { email, password }).pipe(
-      tap(res => {
-        const user: AuthUser = {
-          userId: res.user.user_id,
-          email: res.user.email,
-          role: res.user.role,
-          warnings: res.user.warnings ?? 0,
+    password = sha256(password);
+    return this.http.post<LoginResponse>(`${this.apiBaseUrl}/auth/login`, { email, password }).pipe(
+      tap((resp) => {
+        const u: AuthUser = {
+          userId: resp.user.user_id,
+          email: resp.user.email,
+          role: resp.user.role,
+          warnings: (resp.user as any).warnings ?? 0,
         };
 
-        this.setSession(res.token, user);
+        this.setSession(resp.token, u);
       })
     );
   }
@@ -178,5 +190,45 @@ export class AuthService {
     if (!u) return;
     const current = Number(u.warnings ?? 0);
     localStorage.setItem(this.storageKeyWarningsShown, `${u.userId}:${current}`);
+  }
+
+  getOwnerOrders( restaurantID:string){
+    const url = `${this.apiBaseUrl}/owner/${restaurantID}/orders/`;
+  }
+  getOwnerRestaurant(){
+    const url =`${this.apiBaseUrl}/owner/restaurants`;
+    /*let restaurants = [
+      {
+        "restaurant_id": 0,
+        "restaurant_name": "Orlando",
+        "description": "Bla",
+        "address": "string",
+        "min_order_value": 20,
+        "delivery_radius": 20,
+        "service_fee": 10,
+        "image_data": "string",
+        "geo_lat": 45,
+        "geo_lng": 50,
+        "is_active": true,
+        "category": "Borger"
+      },
+      {
+        "restaurant_id": 1,
+        "restaurant_name": "ThomasBudde",
+        "description": "Blo",
+        "address": "string",
+        "min_order_value": 200,
+        "delivery_radius": 120,
+        "service_fee": 50,
+        "image_data": "string",
+        "geo_lat": 47,
+        "geo_lng": 12,
+        "is_active": true,
+        "category": "ProteinShakes"
+      }
+    ]*/
+    return this.http.get<any>(url);
+
+
   }
 }
