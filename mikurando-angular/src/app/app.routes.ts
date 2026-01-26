@@ -50,6 +50,21 @@ export const routes: Routes = [
     component: MapComponent,
     canActivate: [authGuard]
   },
+  {
+    path: 'forum',
+    canActivate: [authGuard],
+    loadComponent: () => import('./forum/forum.page').then((m) => m.ForumPage),
+  },
+  {
+    path: 'forum/thread/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./forum/forum-thread.page').then((m) => m.ForumThreadPage),
+  },
+  {
+    path: 'owner/forum-moderation',
+    canActivate: [authGuard],
+    loadComponent: () => import('./owner/forum-moderation.page').then((m) => m.OwnerForumModerationPage),
+  },
 
   { path: '**', redirectTo: '/notfound' },
 ];
