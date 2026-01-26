@@ -16,6 +16,9 @@ const authenticateToken = (req, res, next) => {
         }
 
         req.user = decoded;
+        if (req.user && req.user.user_id === undefined && req.user.userId !== undefined) {
+            req.user.user_id = req.user.userId;
+        }
 
         next();
     })
