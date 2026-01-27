@@ -17,6 +17,34 @@
       {{ expandedOrderId === order.order_id ? 'Hide Payload' : 'Show Payload' }}
     </button>
 
+    <div *ngIf="order.status === 'PLACED'">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateOrderStatus(order, 'ACCEPTED')"
+      >
+        Accept
+      </button>
+
+      <button
+        mat-raised-button
+        color="warn"
+        (click)="updateOrderStatus(order, 'DECLINED')"
+      >
+        Reject
+      </button>
+    </div>
+
+    <div *ngIf="getNextStatus(order.status) as nextStatus">
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="updateOrderStatus(order, nextStatus)"
+      >
+        Mark as {{ nextStatus }}
+      </button>
+    </div>
+
     <div *ngIf="expandedOrderId === order.order_id">
       <pre>{{ order.payload || order | json }}</pre>
     </div>

@@ -81,4 +81,21 @@ export class OrderReception implements OnInit {
     this.expandedOrderId =
       this.expandedOrderId === orderId ? null : orderId;
   }
+
+  updateOrderStatus(order: IncomingOrder, newStatus: OrderStatus) {
+    order.status = newStatus;
+  }
+
+  getNextStatus(status: OrderStatus): OrderStatus | null {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'PREPARING';
+      case 'PREPARING':
+        return 'READY';
+      case 'READY':
+        return 'DISPATCHED';
+      default:
+        return null;
+    }
+  }
 }
