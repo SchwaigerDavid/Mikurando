@@ -64,7 +64,9 @@ export class OrderReception implements OnInit {
         )
         .pipe(
           catchError(err => {
-            console.error('Orders loading failed', err);
+            if (err.status !== 401) { //der fehler ist erwartet, und wird deshalb ausgeblendet
+              console.error('Orders loading failed', err);
+            }
             return of([]);
           })
         )
