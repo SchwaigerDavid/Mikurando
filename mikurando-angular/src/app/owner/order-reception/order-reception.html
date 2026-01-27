@@ -1,18 +1,29 @@
 <h2>Incoming Orders</h2>
 
-<mat-card *ngFor="let order of orders" style="margin-bottom:12px">
-  <mat-card-title>Order #{{ order.order_id }}</mat-card-title>
+<ng-container *ngIf="orders$ | async as orders; else loading">
 
-  <p>Status: <strong>{{ order.status }}</strong></p>
-  <p>Total: {{ order.total_price }} €</p>
-  <p>Address: {{ order.delivery_address }}</p>
-  <p>Created: {{ order.created_at | date:'short' }}</p>
+  <div *ngIf="orders.length === 0">
+    <p>No orders yet.</p>
+  </div>
 
-  <button mat-button color="primary" *ngIf="order.status === 'PLACED'">
-    Accept
-  </button>
+  <mat-card *ngFor="let order of orders" style="margin-bottom:12px">
+    <mat-card-title>Order #{{ order.order_id }}</mat-card-title>
 
-  <button mat-button color="warn" *ngIf="order.status === 'PLACED'">
-    Decline
-  </button>
-</mat-card>
+    <p>Status: <strong>{{ order.status }}</strong></p>
+    <p>Total: {{ order.total_price }} €</p>
+    <p>Address: {{ order.delivery_address }}</p>
+
+    <button mat-button (click)="toggleOrderDetails(order.order_id)">
+      {{ expandedOrderId === order.order_id ? 'Hide Payload' : 'Show Payload' }}
+    </button>
+
+    <div *ngIf="expandedOrderId === order.order_id">
+      <pre>{{ order.payload || order | json }}</pre>
+    </div>
+  </mat-card>
+
+</ng-container>
+
+<ng-template #loading>
+  <p>Loading orders…</p>
+</ng-template>

@@ -2,13 +2,17 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { Component, OnInit } from '@angular/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { inject } from '@angular/core';
 import { Subject, interval } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
+import { catchError, of } from 'rxjs';
 
 
 type OrderStatus =
@@ -28,6 +32,8 @@ type IncomingOrder = {
   created_at: string;
   total_price: number;
   delivery_address: string;
+  // Payload property hinzufügen
+  payload?: any;
 };
 
 @Component({
@@ -38,47 +44,39 @@ type IncomingOrder = {
     MatCardModule,
     MatButtonModule,
     MatChipsModule,
+    MatExpansionModule,
   ],
   templateUrl: './order-reception.html',
   styleUrl: './order-reception.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderReception implements OnInit {
 
-  private destroy$ = new Subject<void>();
-  private platformId = inject(PLATFORM_ID);
+  restaurantId = 5;
+  expandedOrderId: number | null = null;
 
-  testOrders = [
-    { order_id: 0, customer: 'Testkunde', status: 'NEW', total: 24.9 }
-  ];
-
-  orders: IncomingOrder[] = [];
-
-  restaurantId = 5; // später aus Auth / Route
+  orders$ = interval(5000).pipe(
+    startWith(0),
+    switchMap(() =>
+      this.http
+        .get<IncomingOrder[]>(
+          `http://localhost:3000/orders/restaurant/${this.restaurantId}`
+        )
+        .pipe(
+          catchError(err => {
+            console.error('Orders loading failed', err);
+            return of([]);
+          })
+        )
+    )
+  );
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {
-    if (!isPlatformBrowser(this.platformId)) {
-      return; // KEIN HTTP / Polling auf dem Server
-    }
+  ngOnInit() {}
 
-    interval(5000)
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(() =>
-          this.http.get<IncomingOrder[]>(
-            `http://localhost:3000/orders/restaurant/${this.restaurantId}`
-          )
-        )
-      )
-      .subscribe({
-        next: orders => this.orders = orders,
-        error: err => console.error('Order polling failed', err)
-      });
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+  toggleOrderDetails(orderId: number) {
+    this.expandedOrderId =
+      this.expandedOrderId === orderId ? null : orderId;
   }
 }
