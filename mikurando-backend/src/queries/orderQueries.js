@@ -22,8 +22,9 @@ const getOrdersByUserId = `
         r.restaurant_name,
         o.status,
         o.total_price,
-        o.created_at
-    FROM "Order" o
+        o.created_at,
+        o.estimated_delivery_time
+    FROM "Order" o  
     JOIN "Restaurant" r ON o.restaurant_id = r.restaurant_id
     WHERE o.user_id = $1
     ORDER BY o.created_at DESC

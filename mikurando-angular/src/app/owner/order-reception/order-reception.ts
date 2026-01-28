@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
@@ -13,6 +13,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 import { startWith } from 'rxjs/operators';
 import { ChangeDetectorRef } from '@angular/core';
 import { catchError, of } from 'rxjs';
+import { AuthService } from '../../shared/auth/auth.service';
 
 
 type OrderStatus =
@@ -52,8 +53,9 @@ type IncomingOrder = {
 })
 export class OrderReception implements OnInit {
 
-  restaurantId = 5;
+  restaurantId = 7; //anpassen sodass nicht hard coded...
   expandedOrderId: number | null = null;
+  private authService = inject(AuthService);
 
   orders$ = interval(5000).pipe(
     startWith(0),
@@ -88,11 +90,7 @@ export class OrderReception implements OnInit {
     const previousStatus = order.status;
     order.status = newStatus; // optimistic UI
 
-    this.http
-      .patch(
-        `http://localhost:3000/orders/restaurant/${this.restaurantId}/orders/${order.order_id}`,
-        payload
-      )
+    this.authService.getOwnerOrders(""+this.restaurantId)
       .subscribe({
         next: res => {
           console.log('Order updated', res);

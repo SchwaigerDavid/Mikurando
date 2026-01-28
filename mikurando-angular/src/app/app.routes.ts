@@ -11,6 +11,8 @@ import {GraphComponent} from './owner/dashboard/graphs/graphs.component';
 import {DashboardOwner} from './owner/dashboard/dashboard';
 import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-card';
 import { RestaurantList } from './customer/restaurant-list/restaurant-list';
+import { Feedback } from './customer/feedback/feedback';
+import { Tracking } from './customer/tracking/tracking';
 import { RestaurantSite } from './customer/restaurant-site/restaurant-site';
 import { CartSite } from './customer/cart-site/cart-site';
 import { Checkout } from './customer/checkout/checkout';
@@ -86,7 +88,7 @@ export const routes: Routes = [
     component: MapComponent,
     canActivate: [authGuard]
   },
- 
+
   {
     path: 'forum',
     canActivate: [authGuard],
@@ -111,6 +113,16 @@ export const routes: Routes = [
   {
     path: 'owner/dishes/:restaurantId/create',
     component: CreateDishComponent
+  },
+
+  {
+    path: 'customer/feedback',
+    component: Feedback
+  },
+
+  {
+    path: 'customer/tracking',
+    component: Tracking
   },
 
   { path: '**', redirectTo: '/notfound' },

@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 import { sha256 } from 'js-sha256';
 
 
+
 export type Role = 'CUSTOMER' | 'OWNER' | 'MANAGER';
 
 export type AuthUser = {
@@ -241,6 +242,49 @@ export class AuthService {
 
   getRestaurantReviews(restaurantId: number): Observable<Review[]> {
     return this.http.get<Review[]>(`${this.apiBaseUrl}/restaurants/${restaurantId}/reviews`);
+  }
+
+  getOrdersByUserId(userId: number) {
+    const url = `${this.apiBaseUrl}/orders/user/${userId}`;
+    return this.http.get<any[]>(url);
+  }
+
+  getOrdersForCurrentUser() {
+    const url = `${this.apiBaseUrl}/orders`;
+    return this.http.get<any[]>(url);
+  }
+
+
+  submitReview(restaurantId: number, rating: number, comment: string, dishId: any, userId: number = 0) {
+    const reviewPayload = {
+      user_id: userId,
+      rating: rating,
+      comment: comment,
+      dish_id: dishId,
+      created_at: new Date().toISOString()
+    };
+
+    const url = `${this.apiBaseUrl}/restaurants/${restaurantId}/reviews`;
+
+    return this.http.post(url, reviewPayload, { observe: 'response' }).subscribe({
+      next: (response) => {
+        console.log('Review erfolgreich gesendet:', response);
+        alert('Feedback erfolgreich abgeschickt!');
+      },
+      error: (err) => {
+        if (err.status === 400) {
+          alert('Fehlerhafte Eingabe.');
+        } else if (err.status === 404) {
+          alert('Restaurant nicht gefunden.');
+        } else if (err.status === 500) {
+          alert('Serverfehler. Bitte später erneut versuchen.');
+        } else {
+          alert('Fehler beim Senden des Feedbacks.');
+        }
+        console.error('Fehler beim Review:', err);
+      },
+      complete: () => console.log('Review-Prozess abgeschlossen')
+    });
   }
 }
 

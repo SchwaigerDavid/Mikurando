@@ -1,0 +1,25 @@
+<h2>Meine Bestellungen</h2>
+
+<ng-container *ngIf="orders.length > 0; else noOrders">
+  <mat-card *ngFor="let order of orders" style="margin-bottom:12px">
+    <mat-card-title>Order #{{ order.order_id }} – {{ order.restaurant_name }}</mat-card-title>
+
+    <p>Status: <strong>{{ order.status }}</strong></p>
+    <p>Total: {{ order.total_price }} €</p>
+    <p>Erstellt am: {{ order.created_at | date:'short' }}</p>
+    <p>Lieferdauer: {{ order.estimated_delivery_time }} </p>
+
+
+    <button mat-button (click)="toggleOrderDetails(order.order_id)">
+      {{ expandedOrderId === order.order_id ? 'Details ausblenden' : 'Details anzeigen' }}
+    </button>
+
+    <div *ngIf="expandedOrderId === order.order_id">
+      <pre>{{ order | json }}</pre>
+    </div>
+  </mat-card>
+</ng-container>
+
+<ng-template #noOrders>
+  <p>Keine Bestellungen gefunden.</p>
+</ng-template>
