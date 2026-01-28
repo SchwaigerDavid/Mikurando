@@ -5,11 +5,20 @@
     <a routerLink="/forum" *ngIf="isLoggedIn()">Forum</a>
     <a routerLink="/admin" *ngIf="isLoggedIn()">Site-Manager</a>
     <a routerLink="/map" *ngIf="isLoggedIn()">Map</a>
-
+   
     <span class="user" *ngIf="isLoggedIn()">{{ userName() }}</span>
 
     <a routerLink="/login" *ngIf="!isLoggedIn()">Login</a>
     <button class="linkbtn" type="button" (click)="logout()" *ngIf="isLoggedIn()">Logout</button>
+    <a routerLink="/cart" *ngIf="isLoggedIn()" class="cart-link">
+      <mat-icon [matBadge]="cartItemCount()" 
+                [matBadgeHidden]="cartItemCount() === 0"
+                matBadgeColor="warn"
+                matBadgeSize="small">
+        shopping_cart
+      </mat-icon>
+    </a>
+
   </div>
 </nav>
 

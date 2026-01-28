@@ -1,0 +1,65 @@
+<div class="tracking-container">
+  <h2>Lieferung wird verfolgt</h2>
+  
+  <!-- Order Details -->
+  <mat-card class="order-details-card" *ngIf="deliveryData()">
+    <mat-card-header>
+      <mat-card-title>Bestelldetails</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="order-info">
+        <div class="info-section">
+          <h4>Liefern an:</h4>
+          <p><strong>{{ deliveryData().delivery.name }}</strong></p>
+          <p>{{ deliveryData().delivery.street }}</p>
+          <p>{{ deliveryData().delivery.postalCode }} {{ deliveryData().delivery.city }}</p>
+          <p>Telefon: {{ deliveryData().delivery.phone }}</p>
+        </div>
+        <div class="info-section">
+          <h4>Bestellsumme:</h4>
+          <p class="total">{{ deliveryData().total | number:'1.2-2' }} €</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  
+  <!-- Delivery Status -->
+  <mat-card class="status-card">
+    <mat-card-header>
+      <mat-card-title>Bestellstatus</mat-card-title>
+      <mat-card-subtitle>Voraussichtliche Lieferzeit: {{ estimatedTime() }} Minuten</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="delivery-steps">
+        <div *ngFor="let step of deliverySteps; let i = index" 
+             class="step" 
+             [class.completed]="step.completed"
+             [class.active]="i === currentStep()">
+          <div class="step-icon">
+            <mat-icon>{{ step.icon }}</mat-icon>
+          </div>
+          <div class="step-label">{{ step.label }}</div>
+          <div class="step-line" *ngIf="i < deliverySteps.length - 1"></div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  
+  <!-- Map -->
+  <mat-card class="map-card">
+    <mat-card-header>
+      <mat-card-title>Live-Tracking</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-map [customerLocation]="customerCoordinates()"></app-map>
+    </mat-card-content>
+  </mat-card>
+  
+  <!-- Action Button -->
+  <div class="action-buttons">
+    <button mat-raised-button color="primary" (click)="goToRestaurants()">
+      <mat-icon>restaurant</mat-icon>
+      Zurück zu Restaurants
+    </button>
+  </div>
+</div>
