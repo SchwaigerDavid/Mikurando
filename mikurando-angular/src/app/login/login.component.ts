@@ -58,7 +58,7 @@ export class LoginComponent {
             warnings: number;
           } =JSON.parse(User);
           if(myUser.role=="CUSTOMER"){
-
+            this.router.navigateByUrl('/restaurants'); 
           }else if(myUser.role=="MANAGER"){
             this.router.navigateByUrl('/home');
           }else if(myUser.role=="OWNER"){

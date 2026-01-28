@@ -8,6 +8,7 @@ const getRestaurantsByOwnerId = async (userId) => {
 };
 
 const createRestaurant = async (ownerId, data) => {
+    console.log('Creating restaurant with data:', data);
     const {
         restaurant_name, description, address, area_code, customer_notes,
         min_order_value, delivery_radius, category, geo_lat, geo_lng,

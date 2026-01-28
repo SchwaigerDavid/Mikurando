@@ -85,6 +85,16 @@ const updateOpeningHours = async (restaurantId, ownerId, schedule) => {
 const addDish = async (restaurantId, dishData) => {
     const { category_id, name, description, price, available, image_data } = dishData;
 
+    let imageBytea = null;
+    if (image_data && image_data.trim()) {
+        try {
+            imageBytea = Buffer.from(image_data, 'base64');
+        } catch (err) {
+            console.warn('Image conversion error:', err);
+            imageBytea = null;
+        }
+    }
+
     const result = await db.query(queries.addDish, [
         restaurantId,
         category_id,
@@ -92,7 +102,7 @@ const addDish = async (restaurantId, dishData) => {
         description,
         price,
         available,
-        image_data || ''
+        imageBytea
     ]);
     return result.rows[0];
 };
@@ -100,11 +110,21 @@ const addDish = async (restaurantId, dishData) => {
 const updateDish = async (dishId, restaurantId, ownerId, dishData) => {
     const { category_id, name, description, price, available, image_data } = dishData;
 
+    let imageBytea = null;
+    if (image_data && image_data.trim()) {
+        try {
+            imageBytea = Buffer.from(image_data, 'base64');
+        } catch (err) {
+            console.warn('Image conversion error:', err);
+            imageBytea = null;
+        }
+    }
+
     const result = await db.query(queries.updateDish, [
         name,
         description,
         price,
-        image_data || '',
+        imageBytea,
         available,
         category_id,
         dishId,

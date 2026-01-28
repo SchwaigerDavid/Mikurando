@@ -21,7 +21,8 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
 ); // Allow incoming Requests to come from different Origins (Use CORS for the app
-app.use(express.json()); // Allow JSON bodies in requests -> look at API spec
+app.use(express.json({ limit: '50mb' })); // Allow JSON bodies in requests -> look at API spec
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 
 app.use('/auth', authentificationRoutes); // Registers Authentification Routes
@@ -37,5 +38,6 @@ app.use('/forum', forumRoutes);
 const PORT = process.env.PORT;
 
 app.listen(PORT, async () => { // Start Server :)
-    console.log(`Server Running on Port ${PORT}`);
+    console.log(`✅ Server Running on Port ${PORT}`);
+    console.log(`📝 Logging aktiviert - Console.logs sollten hier sichtbar sein`);
 });

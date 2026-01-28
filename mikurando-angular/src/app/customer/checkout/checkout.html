@@ -62,13 +62,14 @@
   
   <!-- Action Buttons -->
   <div class="action-buttons">
-    <button mat-raised-button (click)="cancelOrder()" class="cancel-button">
+    <button mat-raised-button (click)="cancelOrder()" class="cancel-button" [disabled]="isProcessing">
       <mat-icon>arrow_back</mat-icon>
       Zurück zum Warenkorb
     </button>
-    <button mat-raised-button color="primary" (click)="processOrder()" class="order-button">
-      <mat-icon>shopping_cart_checkout</mat-icon>
-      Jetzt bestellen
+    <button mat-raised-button color="primary" (click)="processOrder()" class="order-button" [disabled]="isProcessing">
+      <mat-spinner *ngIf="isProcessing" diameter="20" class="spinner"></mat-spinner>
+      <mat-icon *ngIf="!isProcessing">shopping_cart_checkout</mat-icon>
+      {{ isProcessing ? 'Wird verarbeitet...' : 'Jetzt bestellen' }}
     </button>
   </div>
 </div>

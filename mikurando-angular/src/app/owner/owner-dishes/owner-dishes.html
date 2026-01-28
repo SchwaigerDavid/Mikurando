@@ -1,0 +1,98 @@
+<div class="owner-dishes-wrapper">
+  <mat-card class="owner-dishes-card">
+    <mat-card-header>
+      <mat-card-title>Meine Restaurants & Dishes</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (isLoading) {
+        <div class="loading-state">
+          <p>Wird geladen...</p>
+        </div>
+      } @else if (restaurants.length === 0) {
+        <div class="empty-state">
+          <h2>Keine Restaurants vorhanden</h2>
+          <p>Erstellen Sie Ihr erstes Restaurant-Profil</p>
+          <a mat-raised-button color="primary" routerLink="/owner/restaurant-profile">
+            Restaurant erstellen
+          </a>
+        </div>
+      } @else {
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+          @for (restaurant of restaurants; track restaurant.restaurant_id) {
+            <mat-tab [label]="restaurant.restaurant_name">
+              <ng-template matTabContent>
+                <div class="restaurant-content">
+                  <div class="restaurant-info">
+                    <h3>{{ restaurant.restaurant_name }}</h3>
+                    <p class="description">{{ restaurant.description }}</p>
+                    <p class="address">📍 {{ restaurant.address }}</p>
+                    <p class="category">Kategorie: {{ restaurant.category }}</p>
+                    <div class="button-group">
+                      <button 
+                        mat-raised-button 
+                        color="accent" 
+                        (click)="openCreateCategoryDialog(restaurant.restaurant_id)">
+                        + Kategorie erstellen
+                      </button>
+                      <button 
+                        mat-raised-button 
+                        color="primary"
+                        [routerLink]="['/owner/dishes', restaurant.restaurant_id, 'create']">
+                        + Dish erstellen
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Categories & Dishes -->
+                  @if ((restaurant.menu_categories || []).length > 0) {
+                    <div class="categories-container">
+                      @for (category of getCategoryKeys(restaurant.restaurant_id);
+                      track category) {
+                        <div class="category-section">
+                          <h4>{{ category }}</h4>
+                          <div class="dishes-grid">
+                            @for (dish of
+                            getDishesByCategory(restaurant.restaurant_id)[category];
+                            track dish.dish_id) {
+                              <mat-card class="dish-card">
+                                <mat-card-header>
+                                  <mat-card-title>{{ dish.name }}</mat-card-title>
+                                  <mat-card-subtitle>€ {{ dish.price }}</mat-card-subtitle>
+                                </mat-card-header>
+                                <mat-card-content>
+                                  @if (dish.image_data) {
+                                    <img
+                                      [src]="getImageUrl(dish.image_data)"
+                                      alt="{{ dish.name }}"
+                                      class="dish-image"
+                                    />
+                                  }
+                                  <p class="dish-description">{{ dish.description }}</p>
+                                </mat-card-content>
+                                <mat-card-actions>
+                                  <button mat-stroked-button (click)="openEditDishDialog(restaurant.restaurant_id, dish)">Bearbeiten</button>
+                                  <button mat-stroked-button color="warn" (click)="deleteDish(restaurant.restaurant_id, dish.dish_id, dish.name)">Löschen</button>
+                                </mat-card-actions>
+                              </mat-card>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="no-dishes">
+                      <p>Keine Dishes für dieses Restaurant</p>
+                      <button mat-raised-button color="primary">+ Dish hinzufügen</button>
+                    </div>
+                  }
+                </div>
+              </ng-template>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
+

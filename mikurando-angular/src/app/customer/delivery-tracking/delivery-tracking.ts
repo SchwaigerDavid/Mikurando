@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MapComponent } from '../../components/map/map';
 import { CartService } from '../../shared/services/cart.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-delivery-tracking',
@@ -24,11 +25,13 @@ import { CartService } from '../../shared/services/cart.service';
 export class DeliveryTracking {
   private router = inject(Router);
   private cartService = inject(CartService);
+  private http = inject(HttpClient);
   
   currentStep = signal(0);
   estimatedTime = signal(30); // Minuten
   deliveryData = signal<any>(null);
   customerCoordinates = signal<{ lat: number; lng: number } | null>(null);
+  hasActiveDelivery = signal(false);
   
   deliverySteps = [
     { label: 'Bestellung eingegangen', icon: 'receipt', completed: true },
@@ -39,20 +42,26 @@ export class DeliveryTracking {
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
   
-  ngOnInit() {
+  async ngOnInit() {
     // Lade Bestelldaten aus localStorage nur im Browser
     if (isPlatformBrowser(this.platformId)) {
       const orderData = localStorage.getItem('currentOrder');
       if (orderData) {
         const parsedData = JSON.parse(orderData);
         this.deliveryData.set(parsedData);
+        this.hasActiveDelivery.set(true);
         
-        // Beispiel-Koordinaten für die Lieferadresse (in echter App würde man Geocoding nutzen)
-        // Hier verwenden wir Beispielkoordinaten basierend auf der Lieferadresse
-        this.customerCoordinates.set({
-          lat: 48.2082, // Beispiel: Wien
-          lng: 16.3738
-        });
+        // Nutze die bereits geocodierten Koordinaten aus dem localStorage
+        if (parsedData.geo_lat && parsedData.geo_lng) {
+          this.customerCoordinates.set({
+            lat: parsedData.geo_lat,
+            lng: parsedData.geo_lng
+          });
+          console.log('Kundenkoordinaten aus localStorage:', this.customerCoordinates());
+        } else {
+          // Fallback: Geocodiere die Lieferadresse wenn Koordinaten fehlen
+          await this.geocodeDeliveryAddress(parsedData.delivery);
+        }
       }
     }
     
@@ -63,6 +72,33 @@ export class DeliveryTracking {
     this.cartService.clearCart();
   }
   
+  private async geocodeDeliveryAddress(deliveryAddress: any) {
+    try {
+      // Nutze Nominatim (OpenStreetMap) für Geocoding
+      const address = `${deliveryAddress.street}, ${deliveryAddress.postalCode} ${deliveryAddress.city}`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+      
+      const result: any[] = await this.http.get<any[]>(url).toPromise() || [];
+      
+      if (result.length > 0) {
+        const location = result[0];
+        this.customerCoordinates.set({
+          lat: parseFloat(location.lat),
+          lng: parseFloat(location.lon)
+        });
+        console.log('Geocodierte Adresse:', this.customerCoordinates());
+      } else {
+        console.warn('Adresse konnte nicht geocodiert werden');
+        // Fallback auf Standard-Koordinaten
+        this.customerCoordinates.set({ lat: 48.2082, lng: 16.3738 });
+      }
+    } catch (error) {
+      console.error('Fehler beim Geocoding:', error);
+      // Fallback auf Standard-Koordinaten
+      this.customerCoordinates.set({ lat: 48.2082, lng: 16.3738 });
+    }
+  }
+  
   simulateDelivery() {
     let step = 0;
     const interval = setInterval(() => {
@@ -71,6 +107,14 @@ export class DeliveryTracking {
         this.currentStep.set(step);
         this.estimatedTime.set(30 - (step * 10));
         step++;
+        
+        // Wenn Zugestellt (letzter Schritt), leere localStorage
+        if (step === this.deliverySteps.length) {
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem('currentOrder');
+          }
+          this.hasActiveDelivery.set(false);
+        }
       } else {
         clearInterval(interval);
       }
@@ -82,6 +126,7 @@ export class DeliveryTracking {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('currentOrder');
     }
+    this.hasActiveDelivery.set(false);
     this.router.navigate(['/restaurants']);
   }
 }

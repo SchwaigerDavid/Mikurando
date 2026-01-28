@@ -18,23 +18,18 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Adress</mat-label>
-          <input matInput formControlName="adress">
+          <mat-label>Address</mat-label>
+          <input matInput formControlName="address">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Area Code</mat-label>
-          <input matInput formControlName="area_code">
+          <mat-label>Minimum order value (€)</mat-label>
+          <input matInput type="number" formControlName="min_order_value">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Customer notes</mat-label>
-          <input matInput formControlName="customer_notes">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Minimum order value</mat-label>
-          <input matInput formControlName="min_order_value">
+          <mat-label>Delivery Radius (km)</mat-label>
+          <input matInput type="number" formControlName="delivery_radius">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -42,34 +37,42 @@
           <input matInput formControlName="category">
         </mat-form-field>
 
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Geo Latitude</mat-label>
+          <input matInput type="number" formControlName="geo_lat">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Geo Longitude</mat-label>
+          <input matInput type="number" formControlName="geo_lng">
+        </mat-form-field>
+
+        <div class="image-upload-section">
+          <label for="restaurantImage">Restaurant Bild hochladen:</label>
+          <input 
+            type="file" 
+            id="restaurantImage" 
+            accept="image/*" 
+            (change)="onImageSelected($event)"
+            #fileInput
+            style="display: none;"
+          />
+          <button 
+            mat-raised-button 
+            color="accent" 
+            type="button"
+            (click)="fileInput.click()">
+            Bild auswählen
+          </button>
+          <span *ngIf="imageFileName" class="file-name">{{ imageFileName }}</span>
+        </div>
+
         <button mat-raised-button color="primary" [disabled]="!profileForm.valid" (click)="save()">
           Speichern
         </button>
 
-        <mat-card style="margin-top:16px;" style="margin-bottom:16px;">
-          <mat-card-header>
-            <mat-card-title>Delivery Zones</mat-card-title>
-          </mat-card-header>
-
-          <mat-card-content>
-            <mat-chip-listbox
-              formControlName="deliveryZones"
-              multiple
-            >
-              <mat-chip-option
-                *ngFor="let zone of availableZones"
-                [value]="zone"
-              >
-                {{ zone }}
-              </mat-chip-option>
-            </mat-chip-listbox>
-
-          </mat-card-content>
-        </mat-card>
-
-
-
-        <div formArrayName="openingHours">
+        <div formArrayName="openingHours" style="margin-top: 24px;">
+          <h3>Öffnungszeiten</h3>
           <div
             *ngFor="let day of openingHours.controls; let i = index"
             [formGroupName]="i"

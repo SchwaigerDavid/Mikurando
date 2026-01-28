@@ -11,6 +11,7 @@ import { MapDataService } from '../../shared/map-data-service';
 })
 export class MapComponent implements AfterViewInit {
   @Input() customerLocation: { lat: number; lng: number } | null = null;
+  @Input() showConnection: boolean = true;
   
   private map: any;
   private currentRadiusCircle: any = null;
@@ -51,7 +52,11 @@ export class MapComponent implements AfterViewInit {
           this.initMap(L, userLat, userLng);
           this.addUserMarker(L, userLat, userLng, userName);
           this.addRestaurantMarkers(L, restaurants);
-          this.drawConnectionLine(L, userLat, userLng, restaurants);
+          
+          // Zeichne Verbindung nur wenn showConnection true und customerLocation vorhanden
+          if (this.showConnection && this.customerLocation) {
+            this.drawConnectionLine(L, userLat, userLng, restaurants);
+          }
         },
         error: (err: any) => console.error('Fehler beim Laden der Map-Daten', err)
       });

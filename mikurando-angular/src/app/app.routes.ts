@@ -15,6 +15,8 @@ import { RestaurantSite } from './customer/restaurant-site/restaurant-site';
 import { CartSite } from './customer/cart-site/cart-site';
 import { Checkout } from './customer/checkout/checkout';
 import { DeliveryTracking } from './customer/delivery-tracking/delivery-tracking';
+import { OwnerDishes } from './owner/owner-dishes/owner-dishes';
+import { CreateDishComponent } from './owner/create-dish/create-dish';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -99,6 +101,16 @@ export const routes: Routes = [
     path: 'owner/forum-moderation',
     canActivate: [authGuard],
     loadComponent: () => import('./owner/forum-moderation.page').then((m) => m.OwnerForumModerationPage),
+  },
+
+  {
+    path: 'owner/dishes',
+    component: OwnerDishes
+  },
+
+  {
+    path: 'owner/dishes/:restaurantId/create',
+    component: CreateDishComponent
   },
 
   { path: '**', redirectTo: '/notfound' },

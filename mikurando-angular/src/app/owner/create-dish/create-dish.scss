@@ -1,0 +1,164 @@
+.create-dish-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.form-card {
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+
+  mat-card-header {
+    padding: 30px 30px 20px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  mat-card-content {
+    padding: 30px;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+  }
+
+  mat-card-actions {
+    padding: 20px 30px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #f0f0f0;
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+textarea {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+
+    input[type='checkbox'] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.image-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #1976d2;
+    background: #f0f7ff;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      object-fit: cover;
+    }
+  }
+
+  .upload-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #1976d2;
+    font-weight: 500;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #135ba1;
+    }
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+mat-spinner {
+  display: inline-block !important;
+}
+
+@media (max-width: 600px) {
+  .create-dish-container {
+    padding: 20px 10px;
+  }
+
+  .form-card {
+    mat-card-header {
+      padding: 20px;
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+
+    mat-card-content {
+      padding: 20px;
+    }
+
+    mat-card-actions {
+      padding: 15px 20px;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -62,6 +62,7 @@ export class AuthService {
   readonly email = signal<string>(this.reademail());
   readonly user = signal<AuthUser | null>(this.readStructuredUser());
   readonly userName = signal<string>(this.readUserName());
+  readonly profilePicture = signal<string>(this.readProfilePicture());
 
   private readToken(): string | null {
     if (!this.isBrowser) return null;
@@ -84,6 +85,11 @@ export class AuthService {
     return this.readStructuredUser()?.email ?? '';
   }
 
+  private readProfilePicture(): string {
+    if (!this.isBrowser) return '';
+    return localStorage.getItem('profile_picture_data') ?? '';
+  }
+
   isLoggedIn(): boolean {
     return !!this.token();
   }
@@ -91,7 +97,19 @@ export class AuthService {
   getemail(): string {
     return this.email() || 'admin';
   }
-  register(email: string, password: string, role: 'CUSTOMER' | 'OWNER' | 'MANAGER', address: string, area_code: string , name: string, surname: string):any{
+
+  private loadProfilePicture(userId: number): void {
+    this.http.get<any>(`${this.apiBaseUrl}/user/${userId}`).subscribe({
+      next: (response) => {
+        if (response.data?.profile_picture_data) {
+          localStorage.setItem('profile_picture_data', response.data.profile_picture_data);
+          this.profilePicture.set(response.data.profile_picture_data);
+        }
+      },
+      error: (err) => console.error('Fehler beim Laden des Profilbilds:', err)
+    });
+  }
+  register(email: string, password: string, role: 'CUSTOMER' | 'OWNER' | 'MANAGER', address: string, area_code: string , name: string, surname: string, profile_picture_data?: string): Observable<any>{
     const salt = 10;
     password = sha256(password);
     const registerPayload = {
@@ -101,37 +119,13 @@ export class AuthService {
       surname: surname,
       address: address,
       area_code:area_code,
-      role: role
+      role: role,
+      profile_picture_data: profile_picture_data || ''
     };
     console.log(registerPayload);
     const url = `${this.apiBaseUrl}/auth/register`;
 
-    this.http.post(url, registerPayload).subscribe({next: (response) => {
-        // Wird bei Status 201 (Created) aufgerufen
-        console.log('Registrierung erfolgreich:', response);
-        alert('Konto wurde erstellt!');
-      },
-      error: (err) => {
-        // Fehlerbehandlung basierend auf dem Statuscode vom Backend
-        if (err.status === 409) {
-          // Entspricht deinem res.status(409) im Backend
-          console.error('Konflikt:', err.error.error);
-          alert('Diese E-Mail-Adresse ist bereits registriert.');
-        } else if (err.status === 500) {
-          // Entspricht deinem res.status(500) im Backend
-          console.error('Server Fehler:', err.error.error);
-          alert('Ein interner Serverfehler ist aufgetreten. Bitte später versuchen.');
-        } else {
-          // Sonstige Fehler (z.B. Netzwerkprobleme)
-          console.error('Unerwarteter Fehler:', err);
-          alert('Verbindung zum Server fehlgeschlagen.');
-        }
-        return false;
-      },
-      complete: () => {
-      return true;
-        console.log('Registrierungsprozess abgeschlossen');
-      }});
+    return this.http.post(url, registerPayload);
   }
   login(email: string, password: string): Observable<LoginResponse> {
     password = sha256(password);
@@ -169,16 +163,21 @@ export class AuthService {
     this.token.set(token);
     this.user.set(user);
     this.email.set(user.email);
+    
+    // Lade Profilbild vom Backend
+    this.loadProfilePicture(user.userId);
   }
 
   logout() {
     if (this.isBrowser) {
       localStorage.removeItem(this.storageKeyToken);
       localStorage.removeItem(this.storageKeyUser);
+      localStorage.removeItem('profile_picture_data');
     }
 
     this.token.set(null);
     this.email.set('');
+    this.profilePicture.set('');
     this.user.set(null);
   }
 

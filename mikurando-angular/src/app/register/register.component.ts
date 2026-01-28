@@ -50,7 +50,7 @@ export class RegisterComponent {
     role: ['', Validators.required],
   });
   fithFormGroup = this._formBuilder.group({
-    profilePic: [File, Validators.required],
+    profilePic: ['', Validators.required],
   });
 
   hide = signal(true);
@@ -64,8 +64,14 @@ export class RegisterComponent {
     const file: File = event.target.files[0];
     if (file) {
       this.fileName = file.name;
-      // Hier kannst du den Wert in dein fithFormGroup schreiben
-      this.fithFormGroup.patchValue({ profilePic: File });
+      
+      // Lese die Datei als Base64-String
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        this.fithFormGroup.patchValue({ profilePic: base64String as any });
+      };
+      reader.readAsDataURL(file);
     }
   }
   done(){
@@ -83,23 +89,48 @@ export class RegisterComponent {
 
       const password = this.thirdFormGroup.value.password ?? '';
       const role = (this.fourthFormGroup.value.role as 'CUSTOMER' | 'OWNER' | 'MANAGER') ?? 'CUSTOMER';
-      if(this.authService.register(email,password,role,address,areacode,firstname,lastname)) {
-        this.authService.login(email,password)
-        const User:string =localStorage.getItem("user") ?? " ";
-        const myUser:{
-          userId: number;
-          email: string;
-          role: 'CUSTOMER' | 'OWNER' | 'MANAGER';
-          warnings: number;
-        } =JSON.parse(User);
-        if(myUser.role=="CUSTOMER"){
-
-        }else if(myUser.role=="MANAGER"){
-
-        }else if(myUser.role=="OWNER"){
-          this.router.navigateByUrl('/ownerdash');
+      const profilePic = this.fithFormGroup.value.profilePic as string ?? '';
+      
+      // Registrierung durchführen
+      this.authService.register(email, password, role, address, areacode, firstname, lastname, profilePic).subscribe({
+        next: (response) => {
+          console.log('Registrierung erfolgreich:', response);
+          
+          // Nach erfolgreicher Registrierung automatisch einloggen
+          this.authService.login(email, password).subscribe({
+            next: (loginResponse) => {
+              console.log('Login erfolgreich:', loginResponse);
+              
+              // Weiterleitung basierend auf Rolle
+              const user = this.authService.user();
+              if (user?.role === 'CUSTOMER') {
+                this.router.navigateByUrl('/restaurants');
+              } else if (user?.role === 'MANAGER') {
+                this.router.navigateByUrl('/home');
+              } else if (user?.role === 'OWNER') {
+                this.router.navigateByUrl('/ownerdash');
+              }
+            },
+            error: (loginErr) => {
+              console.error('Login nach Registrierung fehlgeschlagen:', loginErr);
+              alert('Konto wurde erstellt, aber Login fehlgeschlagen. Bitte manuell einloggen.');
+            }
+          });
+        },
+        error: (err) => {
+          // Fehlerbehandlung basierend auf dem Statuscode
+          if (err.status === 409) {
+            alert('Diese E-Mail-Adresse ist bereits registriert.');
+          } else if (err.status === 500) {
+            alert('Ein interner Serverfehler ist aufgetreten. Bitte später versuchen.');
+          } else if (err.status === 413) {
+            alert('Das Profilbild ist zu groß. Bitte wählen Sie ein kleineres Bild.');
+          } else {
+            alert('Verbindung zum Server fehlgeschlagen.');
+          }
+          console.error('Registrierungsfehler:', err);
         }
-      }
+      });
     }
 
   }

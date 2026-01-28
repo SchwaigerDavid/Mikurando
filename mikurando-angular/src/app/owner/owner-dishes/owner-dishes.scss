@@ -1,0 +1,163 @@
+.owner-dishes-wrapper {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 16px;
+}
+
+.owner-dishes-card {
+  padding: 24px;
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 32px;
+}
+
+.empty-state h2 {
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  margin-bottom: 24px;
+  opacity: 0.7;
+}
+
+.restaurant-content {
+  padding: 24px 0;
+}
+
+.restaurant-info {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: color-mix(in srgb, var(--mat-sys-primary) 5%, transparent);
+  border-radius: 8px;
+
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 8px 0;
+    color: var(--mat-sys-on-surface);
+    opacity: 0.8;
+
+    &.address {
+      font-weight: 500;
+    }
+  }
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+
+    button {
+      flex: 1;
+      min-width: 180px;
+
+      @media (max-width: 600px) {
+        min-width: 150px;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.categories-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.category-section {
+  h4 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--mat-sys-primary);
+    border-bottom: 2px solid var(--mat-sys-primary);
+    padding-bottom: 8px;
+  }
+}
+
+.dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  mat-card-header {
+    padding: 16px 16px 12px;
+  }
+
+  mat-card-title {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  mat-card-subtitle {
+    color: var(--mat-sys-primary);
+    font-weight: 600;
+  }
+
+  mat-card-content {
+    padding: 12px 16px;
+    flex-grow: 1;
+  }
+
+  .dish-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .dish-description {
+    font-size: 13px;
+    color: var(--mat-sys-on-surface);
+    opacity: 0.75;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  mat-card-actions {
+    padding: 12px 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+.no-dishes {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--mat-sys-on-surface);
+  opacity: 0.6;
+
+  p {
+    margin-bottom: 16px;
+  }
+}

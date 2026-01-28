@@ -22,6 +22,7 @@ export class App {
 
   isLoggedIn = computed(() => this.auth.isLoggedIn());
   userName = computed(() => this.auth.getemail());
+  profilePicture = computed(() => this.auth.profilePicture());
   cartItemCount = computed(() => this.cartService.itemCount());
   // @ts-ignore
   getHome():string{

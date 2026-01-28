@@ -17,7 +17,7 @@ exports.getRestaurants = async (req, res) => {
 
 exports.createRestaurant = async (req, res) => {
     const ownerId = req.user.userId;
-
+    console.log('Create Restaurant Request Body:', req.body);
     const {
         restaurant_name, description, address, area_code, customer_notes,
         min_order_value, delivery_radius, service_fee,
@@ -31,7 +31,7 @@ exports.createRestaurant = async (req, res) => {
 
     if (address && !hasCoordinates) {
         console.log(`Geocoding address: ${address} ${area_code || ''}`);
-
+        
         const searchString = `${address}, ${area_code || ''}`;
         const coords = await geocodeAddress(searchString);
 
