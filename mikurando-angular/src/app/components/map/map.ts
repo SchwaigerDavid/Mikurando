@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit, NgZone} from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, AfterViewInit, NgZone, Input} from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { MapDataService } from '../../shared/map-data-service';
@@ -10,6 +10,8 @@ import { MapDataService } from '../../shared/map-data-service';
   styleUrl: './map.scss',
 })
 export class MapComponent implements AfterViewInit {
+  @Input() customerLocation: { lat: number; lng: number } | null = null;
+  
   private map: any;
   private currentRadiusCircle: any = null;
 
@@ -41,16 +43,20 @@ export class MapComponent implements AfterViewInit {
           const user = data.user.data;
           const restaurants = data.restaurants;
 
-          this.initMap(L, user.geo_lat, user.geo_lng);
-          this.addUserMarker(L, user.geo_lat, user.geo_lng, user.name);
+          // Nutze Kundenkoordinaten wenn vorhanden, sonst Standard
+          const userLat = this.customerLocation?.lat || user.geo_lat;
+          const userLng = this.customerLocation?.lng || user.geo_lng;
+          const userName = 'Lieferadresse';
+
+          this.initMap(L, userLat, userLng);
+          this.addUserMarker(L, userLat, userLng, userName);
           this.addRestaurantMarkers(L, restaurants);
+          this.drawConnectionLine(L, userLat, userLng, restaurants);
         },
         error: (err: any) => console.error('Fehler beim Laden der Map-Daten', err)
       });
     }
   }
-
-
 
   private initMap(L: any, lat: number, lng: number): void {
     const startLat = lat || 48.2082;
@@ -83,6 +89,7 @@ export class MapComponent implements AfterViewInit {
 
     L.marker([lat, lng], { icon: userIcon })
       .addTo(this.map)
+      .bindPopup(`<b>${name}</b><br>Lieferadresse`)
   }
 
   private addRestaurantMarkers(L: any, restaurants: any[]): void {
@@ -162,5 +169,23 @@ export class MapComponent implements AfterViewInit {
         });
       });
     });
+  }
+
+  private drawConnectionLine(L: any, userLat: number, userLng: number, restaurants: any[]): void {
+    // Wenn erste Restaurant vorhanden ist, zeichne Linie vom Customer zum Restaurant
+    if (restaurants.length > 0) {
+      const restaurant = restaurants[0];
+      if (restaurant.geo_lat && restaurant.geo_lng) {
+        const polyline = L.polyline(
+          [[userLat, userLng], [restaurant.geo_lat, restaurant.geo_lng]],
+          {
+            color: '#3f51b5',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '5, 5'
+          }
+        ).addTo(this.map);
+      }
+    }
   }
 }

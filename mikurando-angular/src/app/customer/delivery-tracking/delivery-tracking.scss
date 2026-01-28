@@ -1,0 +1,206 @@
+.tracking-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  h2 {
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+  }
+  
+  mat-card {
+    margin-bottom: 20px;
+  }
+  
+  .order-details-card {
+    background-color: #f9f9f9;
+    
+    .order-info {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      
+      .info-section {
+        h4 {
+          margin-bottom: 10px;
+          color: #333;
+        }
+        
+        p {
+          margin: 5px 0;
+          color: #666;
+        }
+        
+        .total {
+          font-size: 1.3em;
+          color: #4caf50;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  
+  .status-card {
+    .delivery-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px;
+      position: relative;
+      
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        flex: 1;
+        
+        .step-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background-color: #e0e0e0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 10px;
+          transition: all 0.3s ease;
+          
+          mat-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+            color: #999;
+          }
+        }
+        
+        .step-label {
+          text-align: center;
+          font-size: 14px;
+          color: #666;
+          max-width: 120px;
+        }
+        
+        .step-line {
+          position: absolute;
+          top: 30px;
+          left: 50%;
+          width: 100%;
+          height: 2px;
+          background-color: #e0e0e0;
+          z-index: -1;
+        }
+        
+        &.completed {
+          .step-icon {
+            background-color: #4caf50;
+            
+            mat-icon {
+              color: white;
+            }
+          }
+          
+          .step-label {
+            color: #4caf50;
+            font-weight: 500;
+          }
+          
+          .step-line {
+            background-color: #4caf50;
+          }
+        }
+        
+        &.active {
+          .step-icon {
+            background-color: #3f51b5;
+            animation: pulse 2s infinite;
+            
+            mat-icon {
+              color: white;
+            }
+          }
+          
+          .step-label {
+            color: #3f51b5;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  
+  .map-card {
+    app-map {
+      display: block;
+      height: 200px;
+      width: 100%;
+    }
+    
+    #map {
+      width: 100%;
+      height: 200px;
+    }
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    
+    button {
+      padding: 12px 32px;
+      font-size: 16px;
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(63, 81, 181, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(63, 81, 181, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(63, 81, 181, 0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+    
+    .order-details-card {
+      .order-info {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .status-card .delivery-steps {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .step {
+        flex-direction: row;
+        width: 100%;
+        margin-bottom: 20px;
+        
+        .step-icon {
+          margin-right: 15px;
+          margin-bottom: 0;
+        }
+        
+        .step-label {
+          text-align: left;
+        }
+        
+        .step-line {
+          display: none;
+        }
+      }
+    }
+  }
+}
