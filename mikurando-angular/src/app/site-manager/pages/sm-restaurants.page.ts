@@ -102,7 +102,7 @@ export class SmRestaurantsPage {
     this.loading.show();
     this.api.getRestaurants().subscribe({
       next: (rows) => this.restaurantsState.set(rows ?? []),
-      error: () => this.notify.error('Restaurants could not be loaded.'),
+      error: () => this.restaurantsState.set([]),
       complete: () => this.loading.hide(),
     });
   }

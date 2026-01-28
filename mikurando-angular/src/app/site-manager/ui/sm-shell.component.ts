@@ -31,7 +31,7 @@ import { AuthService } from '../../shared/auth/auth.service';
 
     <mat-sidenav-container class="sm-container">
       <mat-sidenav mode="side" opened class="sm-sidenav">
-        <div class="sm-brand">Admin</div>
+        <div class="sm-brand">Site-Manager</div>
         <mat-nav-list>
           <a mat-list-item routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <mat-icon matListItemIcon>dashboard</mat-icon>
@@ -61,13 +61,6 @@ import { AuthService } from '../../shared/auth/auth.service';
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <mat-toolbar color="primary" class="sm-toolbar">
-          <span>Mikurando</span>
-          <span class="spacer"></span>
-          <sm-user-info name="admin" role="SITE_MANAGER" />
-          <button mat-button type="button" (click)="logout()">Logout</button>
-        </mat-toolbar>
-
         <div class="sm-content">
           <router-outlet />
         </div>

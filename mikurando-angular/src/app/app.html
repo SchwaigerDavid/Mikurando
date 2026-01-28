@@ -2,7 +2,8 @@
   <div class="brand">Mikurando</div>
   <div class="links">
     <a [routerLink]= getHome() *ngIf="isLoggedIn()">Home</a>
-    <a routerLink="/admin" *ngIf="isLoggedIn()">Admin</a>
+    <a routerLink="/forum" *ngIf="isLoggedIn()">Forum</a>
+    <a routerLink="/admin" *ngIf="isLoggedIn()">Site-Manager</a>
     <a routerLink="/map" *ngIf="isLoggedIn()">Map</a>
 
     <span class="user" *ngIf="isLoggedIn()">{{ userName() }}</span>

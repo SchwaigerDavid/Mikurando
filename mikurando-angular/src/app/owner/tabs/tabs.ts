@@ -1,13 +1,15 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { DashboardOwner } from '../dashboard/dashboard';
 import { AuthService } from '../../shared/auth/auth.service';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [CommonModule, MatTabsModule, DashboardOwner],
+  imports: [CommonModule, MatTabsModule, MatButtonModule, RouterLink, DashboardOwner],
   templateUrl: './tabs.html',
   styleUrl: './tabs.scss',
 })
