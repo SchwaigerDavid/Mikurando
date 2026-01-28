@@ -244,6 +244,17 @@ export class AuthService {
     return this.http.get<Restaurant>(`${this.apiBaseUrl}/restaurants/${id}`);
   }
 
+  getOrdersByUserId(userId: number) {
+    const url = `${this.apiBaseUrl}/orders/user/${userId}`;
+    return this.http.get<any[]>(url);
+  }
+
+  getOrdersForCurrentUser() {
+    const url = `${this.apiBaseUrl}/orders`;
+    return this.http.get<any[]>(url);
+  }
+
+
   submitReview(restaurantId: number, rating: number, comment: string, dishId: any, userId: number = 0) {
     const reviewPayload = {
       user_id: userId,

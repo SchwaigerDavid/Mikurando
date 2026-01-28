@@ -12,6 +12,7 @@ import {DashboardOwner} from './owner/dashboard/dashboard';
 import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-card';
 import { RestaurantList } from './customer/restaurant-list/restaurant-list';
 import { Feedback } from './customer/feedback/feedback';
+import { Tracking } from './customer/tracking/tracking';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -85,6 +86,11 @@ export const routes: Routes = [
   {
     path: 'customer/feedback',
     component: Feedback
+  },
+
+  {
+    path: 'customer/tracking',
+    component: Tracking
   },
 
   { path: '**', redirectTo: '/notfound' },
