@@ -1,19 +1,40 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
+import { inject } from '@angular/core';
+import { Subject, interval } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
+import { startWith } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
+import { catchError, of } from 'rxjs';
 
-type OrderStatus = 'NEW' | 'REJECTED' | 'PREPARING' | 'READY' | 'DISPATCHED';
 
-interface Order {
-  id: number;
-  customerName: string;
-  items: { name: string; qty: number }[];
-  total: number;
+type OrderStatus =
+  | 'PLACED'
+  | 'ACCEPTED'
+  | 'DECLINED'
+  | 'PREPARING'
+  | 'READY'
+  | 'DISPATCHED'
+  | 'DELIVERED'
+  | 'CANCELED';
+
+type IncomingOrder = {
+  order_id: number;
+  user_id: number;
   status: OrderStatus;
-  createdAt: string;
-}
+  created_at: string;
+  total_price: number;
+  delivery_address: string;
+  // Payload property hinzufügen
+  payload?: any;
+};
 
 @Component({
   selector: 'app-order-reception',
@@ -23,46 +44,79 @@ interface Order {
     MatCardModule,
     MatButtonModule,
     MatChipsModule,
+    MatExpansionModule,
   ],
   templateUrl: './order-reception.html',
   styleUrl: './order-reception.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrderReception {
+export class OrderReception implements OnInit {
 
-  orders: Order[] = [
-    {
-      id: 101,
-      customerName: 'Marcel Davis',
-      items: [
-        { name: 'Pizza Margherita', qty: 1 },
-        { name: 'Cola', qty: 2 }],
-      total: 24.90,
-      status: 'NEW',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 102,
-      customerName: 'Jasper Blatt',
-      items: [{ name: 'Pasta Carbonara', qty: 1 }],
-      total: 18.50,
-      status: 'PREPARING',
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  restaurantId = 5;
+  expandedOrderId: number | null = null;
 
-  accept(order: Order) {
-    order.status = 'PREPARING';
+  orders$ = interval(5000).pipe(
+    startWith(0),
+    switchMap(() =>
+      this.http
+        .get<IncomingOrder[]>(
+          `http://localhost:3000/orders/restaurant/${this.restaurantId}`
+        )
+        .pipe(
+          catchError(err => {
+            if (err.status !== 401) { //der fehler ist erwartet, und wird deshalb ausgeblendet
+              console.error('Orders loading failed', err);
+            }
+            return of([]);
+          })
+        )
+    )
+  );
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {}
+
+  toggleOrderDetails(orderId: number) {
+    this.expandedOrderId =
+      this.expandedOrderId === orderId ? null : orderId;
   }
 
-  reject(order: Order) {
-    order.status = 'REJECTED';
+  updateOrderStatus(order: IncomingOrder, newStatus: OrderStatus) {
+    const payload = { status: newStatus };
+
+    const previousStatus = order.status;
+    order.status = newStatus; // optimistic UI
+
+    this.http
+      .patch(
+        `http://localhost:3000/orders/restaurant/${this.restaurantId}/orders/${order.order_id}`,
+        payload
+      )
+      .subscribe({
+        next: res => {
+          console.log('Order updated', res);
+        },
+        error: err => {
+          console.error('Failed to update order', err);
+          order.status = previousStatus; // rollback
+        },
+      });
   }
 
-  markReady(order: Order) {
-    order.status = 'READY';
+
+  getNextStatus(status: OrderStatus): OrderStatus | null {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'PREPARING';
+      case 'PREPARING':
+        return 'READY';
+      case 'READY':
+        return 'DISPATCHED';
+      default:
+        return null;
+    }
   }
 
-  dispatch(order: Order) {
-    order.status = 'DISPATCHED';
-  }
+
 }

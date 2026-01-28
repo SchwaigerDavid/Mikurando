@@ -325,6 +325,80 @@ exports.createCategory = async (req, res) => {
     }
 };
 
+exports.createRestaurant = async (req, res) => {
+    const ownerId = req.user.userId;
+
+    const {
+        restaurant_name,
+        description,
+        address,
+        area_code,
+        customer_notes,
+        min_order_value,
+        category,
+        delivery_zones,
+        opening_hours,
+        delivery_radius
+    } = req.body;
+
+    try {
+        console.log('CREATE RESTAURANT PAYLOAD:', req.body);
+
+        const restaurant = await restaurantModel.createRestaurant({
+            owner_id: ownerId,
+            restaurant_name,
+            description,
+            address,
+            area_code,
+            customer_notes: customer_notes || '',
+            min_order_value: min_order_value || 0,
+            category,
+            delivery_radius: delivery_radius || 5.0,
+        });
+
+        if (opening_hours?.length) {
+            await restaurantModel.setOpeningHours(
+                restaurant.restaurant_id,
+                opening_hours
+            );
+        }
+
+        res.status(201).json({
+            message: 'Restaurant created',
+            restaurant
+        });
+
+    } catch (err) {
+        console.error('Create Restaurant Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.getIncomingOrders = async (req, res) => {
+    const restaurantId = parseInt(req.params.id, 10);
+    const ownerId = req.user.userId;
+
+    try {
+        // Sicherheitcheck:gehört Restaurant dem Owner?
+        const isOwner = await restaurantModel.checkOwnership(restaurantId, ownerId);
+        if (!isOwner) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const orders = await restaurantModel.getOrdersByRestaurant(restaurantId);
+
+        res.status(200).json({
+            message: 'Success',
+            data: orders
+        });
+
+    } catch (err) {
+        console.error('Get Orders Error:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
 exports.deleteCategory = async (req, res) => {
     const { restaurantId, categoryId } = req.params;
     const ownerId = req.user.userId;

@@ -1,49 +1,57 @@
-<div style="display:grid; gap:16px;">
-  <mat-card *ngFor="let order of orders">
+<h2>Incoming Orders</h2>
 
-    <mat-card-header>
-      <mat-card-title>
-        Order #{{ order.id }}
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ order.customerName }} · {{ order.createdAt | date:'short' }}
-      </mat-card-subtitle>
-    </mat-card-header>
+<ng-container *ngIf="orders$ | async as orders; else loading">
 
-    <mat-card-content>
-      <ul>
-        <li *ngFor="let item of order.items">
-          {{ item.qty }} × {{ item.name }}
-        </li>
-      </ul>
+  <div *ngIf="orders.length === 0">
+    <p>No orders yet.</p>
+  </div>
 
-      <strong>Total: {{ order.total | currency:'EUR' }}</strong>
+  <mat-card *ngFor="let order of orders" style="margin-bottom:12px">
+    <mat-card-title>Order #{{ order.order_id }}</mat-card-title>
 
-      <div style="margin-top:8px;">
-        <mat-chip>{{ order.status }}</mat-chip>
-      </div>
-    </mat-card-content>
+    <p>Status: <strong>{{ order.status }}</strong></p>
+    <p>Total: {{ order.total_price }} €</p>
+    <p>Address: {{ order.delivery_address }}</p>
 
-    <mat-card-actions *ngIf="order.status === 'NEW'">
-      <button mat-flat-button color="primary" (click)="accept(order)">
+    <button mat-button (click)="toggleOrderDetails(order.order_id)">
+      {{ expandedOrderId === order.order_id ? 'Hide Payload' : 'Show Payload' }}
+    </button>
+
+    <div *ngIf="order.status === 'PLACED'">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateOrderStatus(order, 'ACCEPTED')"
+      >
         Accept
       </button>
-      <button mat-stroked-button color="warn" (click)="reject(order)">
+
+      <button
+        mat-raised-button
+        color="warn"
+        (click)="updateOrderStatus(order, 'DECLINED')"
+      >
         Reject
       </button>
-    </mat-card-actions>
+    </div>
 
-    <mat-card-actions *ngIf="order.status === 'PREPARING'">
-      <button mat-flat-button color="accent" (click)="markReady(order)">
-        Mark as Ready
+    <div *ngIf="getNextStatus(order.status) as nextStatus">
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="updateOrderStatus(order, getNextStatus(order.status)!)"
+      >
+        Mark as {{ getNextStatus(order.status) }}
       </button>
-    </mat-card-actions>
+    </div>
 
-    <mat-card-actions *ngIf="order.status === 'READY'">
-      <button mat-flat-button color="primary" (click)="dispatch(order)">
-        Dispatched
-      </button>
-    </mat-card-actions>
-
+    <div *ngIf="expandedOrderId === order.order_id">
+      <pre>{{ order.payload || order | json }}</pre>
+    </div>
   </mat-card>
-</div>
+
+</ng-container>
+
+<ng-template #loading>
+  <p>Loading orders…</p>
+</ng-template>

@@ -28,5 +28,21 @@ router.get('/:id',
     orderController.getOrderDetails
 )
 
+router.get(
+    '/restaurant/:id',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    requestParameterValidationMiddleware.validateIdParameter,
+    orderController.getRestaurantOrders
+);
+
+router.patch(
+    '/restaurant/:restaurantId/orders/:orderId',
+    JWTAuthentificationMiddleware.authenticateToken,
+    JWTAuthentificationMiddleware.requireOwner,
+    orderController.updateStatus
+);
+
+
 // Exports
 module.exports = router;
