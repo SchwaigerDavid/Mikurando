@@ -83,8 +83,27 @@ export class OrderReception implements OnInit {
   }
 
   updateOrderStatus(order: IncomingOrder, newStatus: OrderStatus) {
-    order.status = newStatus;
+    const payload = { status: newStatus };
+
+    const previousStatus = order.status;
+    order.status = newStatus; // optimistic UI
+
+    this.http
+      .patch(
+        `http://localhost:3000/orders/restaurant/${this.restaurantId}/orders/${order.order_id}`,
+        payload
+      )
+      .subscribe({
+        next: res => {
+          console.log('Order updated', res);
+        },
+        error: err => {
+          console.error('Failed to update order', err);
+          order.status = previousStatus; // rollback
+        },
+      });
   }
+
 
   getNextStatus(status: OrderStatus): OrderStatus | null {
     switch (status) {
@@ -98,4 +117,6 @@ export class OrderReception implements OnInit {
         return null;
     }
   }
+
+
 }
