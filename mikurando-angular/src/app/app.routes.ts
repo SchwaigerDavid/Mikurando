@@ -11,6 +11,7 @@ import {GraphComponent} from './owner/dashboard/graphs/graphs.component';
 import {DashboardOwner} from './owner/dashboard/dashboard';
 import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-card';
 import { RestaurantList } from './customer/restaurant-list/restaurant-list';
+import { Feedback } from './customer/feedback/feedback';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -64,7 +65,7 @@ export const routes: Routes = [
     component: MapComponent,
     canActivate: [authGuard]
   },
- 
+
   {
     path: 'forum',
     canActivate: [authGuard],
@@ -79,6 +80,11 @@ export const routes: Routes = [
     path: 'owner/forum-moderation',
     canActivate: [authGuard],
     loadComponent: () => import('./owner/forum-moderation.page').then((m) => m.OwnerForumModerationPage),
+  },
+
+  {
+    path: 'customer/feedback',
+    component: Feedback
   },
 
   { path: '**', redirectTo: '/notfound' },

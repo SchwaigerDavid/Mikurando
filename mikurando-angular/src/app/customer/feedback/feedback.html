@@ -1,0 +1,38 @@
+<mat-card class="feedback-card">
+  <mat-card-title>Restaurant Feedback</mat-card-title>
+
+  <form (ngSubmit)="submitFeedback()" class="feedback-form">
+    <mat-form-field appearance="fill">
+      <mat-label>Restaurant ID</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="restaurantId"
+        name="restaurantId"
+        required
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Bewertung (1–5)</mat-label>
+      <mat-select [(ngModel)]="rating" name="rating" required>
+        <mat-option *ngFor="let r of ratings" [value]="r">{{ r }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Kommentar</mat-label>
+      <textarea
+        matInput
+        rows="6"
+        [(ngModel)]="comment"
+        name="comment"
+        placeholder="Dein Feedback..."
+      ></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">
+      Feedback absenden
+    </button>
+  </form>
+</mat-card>
