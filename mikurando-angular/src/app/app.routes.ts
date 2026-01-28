@@ -7,6 +7,8 @@ import {MapComponent} from './components/map/map'
 import { RestaurantProfile } from './owner/restaurant-profile/restaurant-profile';
 import { OrderReception } from './owner/order-reception/order-reception';
 import { authGuard } from './shared/auth/auth.guard';
+import {GraphComponent} from './owner/dashboard/graphs/graphs.component';
+import {DashboardOwner} from './owner/dashboard/dashboard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -15,6 +17,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   {path :'ownerdash',component: Tabs},
   {path:'notfound',component: NotFound},
+  {path:'graph',component: GraphComponent},
+  {path:'dash',component: DashboardOwner},
   {
     path: 'home',
     canActivate: [authGuard],

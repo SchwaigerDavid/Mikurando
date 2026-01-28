@@ -193,7 +193,8 @@ export class AuthService {
   }
 
   getOwnerOrders( restaurantID:string){
-    const url = `${this.apiBaseUrl}/owner/${restaurantID}/orders/`;
+    const url = `${this.apiBaseUrl}/owner/restaurants/${restaurantID}/orders/`;
+    return this.http.get<any>(url);
   }
   getOwnerRestaurant(){
     const url =`${this.apiBaseUrl}/owner/restaurants`;

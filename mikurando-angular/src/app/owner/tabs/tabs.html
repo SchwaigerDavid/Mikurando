@@ -1,20 +1,14 @@
-<div class="dashboard-wrapper">
-  @if (restaurants && restaurants.length > 0) {
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-      @for (restaurant of restaurants; track $index; let i = $index) {
-        <mat-tab [label]="restaurant.restaurant_name">
-          <div class="tab-content-container">
-            <app-dashboard
-              [restaurantIndex]="i"
-              [restaurantData]="restaurant">
-            </app-dashboard>
-          </div>
-        </mat-tab>
-      }
-    </mat-tab-group>
-  } @else {
-    <div class="loading-spinner">
-      <p>Lade Restaurant-Daten, Lieutenant...</p>
-    </div>
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  @for (restaurant of restaurants; track restaurant.restaurant_name + $index) {
+    <mat-tab [label]="restaurant.restaurant_name">
+      <ng-template matTabContent>
+        <div class="tab-content-container">
+          <app-dashboard
+            [restaurantIndex]="$index"
+            [restaurantData]="restaurant">
+          </app-dashboard>
+        </div>
+      </ng-template>
+    </mat-tab>
   }
-</div>
+</mat-tab-group>

@@ -26,14 +26,13 @@
           </mat-button-toggle-group>
         </div>
 
-        <mat-card class="chart-card" style="height: calc(100% - 60px);">
+        <mat-card class="chart-card" style="height: 100%; min-height: 300px;">
           <mat-card-content style="height: 100%;">
             <app-graph [salesData]="currentSales" [labelData]="currentLabels"></app-graph>
           </mat-card-content>
         </mat-card>
       </div>
     </mat-grid-tile>
-
     <mat-grid-tile>
       <order-tables [dataSource]="orders" style="width: 100%; height: 100%;"></order-tables>
     </mat-grid-tile>

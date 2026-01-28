@@ -15,8 +15,8 @@ export class GraphComponent implements AfterViewInit {
   @ViewChild('myChart') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   private chart: Chart | undefined;
-  private _salesData: number[] = [];
-  private _labelData: string[] = [];
+  private _salesData: number[] = [12,25,23,40,24,20];
+  private _labelData: string[] = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
   @Input() set salesData(value: number[]) {
     this._salesData = value || [];
@@ -52,7 +52,6 @@ export class GraphComponent implements AfterViewInit {
           label: 'Sales/Orders',
           data: this._salesData,
           borderColor: color,
-          backgroundColor: color + '33', // Leicht transparent
           tension: 0.4,
           fill: true
         }]
@@ -66,11 +65,17 @@ export class GraphComponent implements AfterViewInit {
   }
 
   updateChart() {
+    // Debug-Logs sind gut, Lieutenant, aber wir brauchen die Canvas-Referenz
+    if (!this.chartCanvas || !isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     if (this.chart) {
       this.chart.data.labels = this._labelData;
       this.chart.data.datasets[0].data = this._salesData;
       this.chart.update();
-    } else if (isPlatformBrowser(this.platformId) && this.chartCanvas) {
+    } else {
+      // Falls das Canvas jetzt da ist, aber der Chart noch nicht existiert
       this.initChart();
     }
   }
