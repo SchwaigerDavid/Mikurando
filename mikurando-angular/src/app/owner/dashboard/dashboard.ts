@@ -117,8 +117,8 @@ export class DashboardOwner implements OnInit {
         this.processData("W",this.orders);
         this.calculateTotals(this.orders);
         this.updateGraphData();
-      },
       }
+    }
     )
   }
   processData(format: 'W' | 'M' | '6M' | 'Y', orders: any[]) {

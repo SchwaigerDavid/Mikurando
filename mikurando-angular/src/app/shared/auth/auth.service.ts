@@ -24,6 +24,24 @@ type LoginResponse = {
   };
 };
 
+export interface Restaurant {
+  restaurant_id: number;
+  restaurant_name: string;
+  description: string;
+  address: string;
+  min_order_value: number;
+  delivery_radius: number;
+  service_fee: number;
+  image_data: string;
+  geo_lat: number;
+  geo_lng: number;
+  is_active: boolean;
+  category: string;
+  rating?: number;
+  distance_km?: number;
+  estimated_time_min?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiURL = 'http://localhost:3000/auth';
@@ -198,38 +216,30 @@ export class AuthService {
   }
   getOwnerRestaurant(){
     const url =`${this.apiBaseUrl}/owner/restaurants`;
-    /*let restaurants = [
-      {
-        "restaurant_id": 0,
-        "restaurant_name": "Orlando",
-        "description": "Bla",
-        "address": "string",
-        "min_order_value": 20,
-        "delivery_radius": 20,
-        "service_fee": 10,
-        "image_data": "string",
-        "geo_lat": 45,
-        "geo_lng": 50,
-        "is_active": true,
-        "category": "Borger"
-      },
-      {
-        "restaurant_id": 1,
-        "restaurant_name": "ThomasBudde",
-        "description": "Blo",
-        "address": "string",
-        "min_order_value": 200,
-        "delivery_radius": 120,
-        "service_fee": 50,
-        "image_data": "string",
-        "geo_lat": 47,
-        "geo_lng": 12,
-        "is_active": true,
-        "category": "ProteinShakes"
-      }
-    ]*/
     return this.http.get<any>(url);
+  }
 
+   getRestaurants(filters?: {
+    name?: string;
+    area_code?: string;
+    category?: string;
+    maxDistance?: number;
+  }): Observable<Restaurant[]> {
+    let url = `${this.apiBaseUrl}/restaurants`;
+    const params = new URLSearchParams();
 
+    if (filters?.name) params.append('name', filters.name);
+    if (filters?.area_code) params.append('area_code', filters.area_code);
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.maxDistance) params.append('maxDistance', filters.maxDistance.toString());
+
+    const queryString = params.toString();
+    if (queryString) url += `?${queryString}`;
+
+    return this.http.get<Restaurant[]>(url);
+  }
+
+  getRestaurantById(id: number): Observable<Restaurant> {
+    return this.http.get<Restaurant>(`${this.apiBaseUrl}/restaurants/${id}`);
   }
 }

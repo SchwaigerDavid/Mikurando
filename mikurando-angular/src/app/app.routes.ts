@@ -9,6 +9,8 @@ import { OrderReception } from './owner/order-reception/order-reception';
 import { authGuard } from './shared/auth/auth.guard';
 import {GraphComponent} from './owner/dashboard/graphs/graphs.component';
 import {DashboardOwner} from './owner/dashboard/dashboard';
+import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-card';
+import { RestaurantList } from './customer/restaurant-list/restaurant-list';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -19,6 +21,14 @@ export const routes: Routes = [
   {path:'notfound',component: NotFound},
   {path:'graph',component: GraphComponent},
   {path:'dash',component: DashboardOwner},
+  {
+    path: 'resCard',
+    component: RestaurantCardComponent
+  },
+   {
+    path: 'restaurants',
+    component: RestaurantList
+  },
   {
     path: 'home',
     canActivate: [authGuard],
@@ -54,6 +64,7 @@ export const routes: Routes = [
     component: MapComponent,
     canActivate: [authGuard]
   },
+ 
   {
     path: 'forum',
     canActivate: [authGuard],

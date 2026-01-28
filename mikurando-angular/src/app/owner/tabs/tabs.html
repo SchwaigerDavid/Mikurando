@@ -1,3 +1,7 @@
+<div class="owner-actions">
+  <a mat-flat-button color="primary" routerLink="/owner/forum-moderation">Forum Moderation</a>
+</div>
+
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
   @for (restaurant of restaurants; track restaurant.restaurant_name + $index) {
     <mat-tab [label]="restaurant.restaurant_name">
@@ -12,27 +16,3 @@
     </mat-tab>
   }
 </mat-tab-group>
-<div class="dashboard-wrapper">
-  <div class="owner-actions">
-    <a mat-flat-button color="primary" routerLink="/owner/forum-moderation">Forum Moderation</a>
-  </div>
-
-  @if (restaurants && restaurants.length > 0) {
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-      @for (restaurant of restaurants; track $index; let i = $index) {
-        <mat-tab [label]="restaurant.restaurant_name">
-          <div class="tab-content-container">
-            <app-dashboard
-              [restaurantIndex]="i"
-              [restaurantData]="restaurant">
-            </app-dashboard>
-          </div>
-        </mat-tab>
-      }
-    </mat-tab-group>
-  } @else {
-    <div class="loading-spinner">
-      <p>Lade Restaurant-Daten, Lieutenant...</p>
-    </div>
-  }
-</div>

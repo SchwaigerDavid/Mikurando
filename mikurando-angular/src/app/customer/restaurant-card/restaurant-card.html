@@ -1,0 +1,16 @@
+<mat-card class="restaurant-card" (click)="navigateToRestaurant()" *ngIf="restaurant">
+  <img mat-card-image class="restaurant-image" [src]="restaurantImage" [alt]="restaurant.restaurant_name">
+  <mat-card-content class="restaurant-content">
+    <mat-card-title class="restaurant-title">{{ restaurant.restaurant_name }}</mat-card-title>
+    <div class="restaurant-rating">
+      <span class="rating-stars">{{ ratingStars }} ({{ ratingDisplay }})</span>
+    </div>
+    <p class="restaurant-description">
+      {{ restaurant.description }}
+    </p>
+    <div class="restaurant-info">
+      <span class="category">{{ restaurant.category }}</span>
+      <span class="distance" *ngIf="restaurant.distance_km">{{ restaurant.distance_km }}km</span>
+    </div>
+  </mat-card-content>
+</mat-card>

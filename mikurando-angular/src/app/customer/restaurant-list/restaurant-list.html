@@ -1,0 +1,22 @@
+<div class="restaurants-container">
+  <h1>Verfügbare Restaurants</h1>
+  
+  <div *ngIf="isLoading()" class="loading">
+    Restaurants werden geladen...
+  </div>
+
+  <div *ngIf="error()" class="error">
+    {{ error() }}
+  </div>
+
+  <div class="restaurants-grid" *ngIf="!isLoading() && !error()">
+    <app-restaurant-card 
+      *ngFor="let restaurant of restaurants()" 
+      [restaurant]="restaurant">
+    </app-restaurant-card>
+  </div>
+
+  <div *ngIf="!isLoading() && restaurants().length === 0" class="no-restaurants">
+    Keine weiteren Restaurants gefunden
+  </div>
+</div>
