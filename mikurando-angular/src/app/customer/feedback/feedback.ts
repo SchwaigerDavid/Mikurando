@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../../shared/auth/auth.service';
 
 @Component({
   selector: 'app-feedback',
@@ -23,19 +24,36 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./feedback.scss']
 })
 export class Feedback {
-  restaurantId: string = '';
+  restaurantId: number | null = null;
   rating: number | null = null;
   comment: string = '';
+  dishId: number | null = null;
 
   ratings = [1, 2, 3, 4, 5];
 
-  submitFeedback() {
-    console.log({
-      restaurantId: this.restaurantId,
-      rating: this.rating,
-      comment: this.comment
-    });
+  constructor(private authService: AuthService) {}
 
-    alert('Feedback gespeichert (lokal)');
+  submitFeedback() {
+    if (!this.restaurantId || !this.rating) {
+      alert('Bitte Restaurant und Bewertung auswählen.');
+      return;
+    }
+
+    const userId = 8;
+    const dish_id = this.dishId ?? null;
+
+    this.authService.submitReview(
+      this.restaurantId,
+      this.rating,
+      this.comment,
+      dish_id, // dish_id, Standardwert 0
+      userId
+    );
+
+    // Optional: Formular zurücksetzen
+    this.restaurantId = null;
+    this.rating = null;
+    this.comment = '';
+    this.dishId = null;
   }
 }
