@@ -11,30 +11,6 @@
   }
 }
 
-.filter-section {
-  margin-bottom: 30px;
-
-  mat-card-content {
-    padding: 20px;
-  }
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  align-items: flex-end;
-}
-
-.filter-field {
-  width: 100%;
-}
-
-.reset-button {
-  height: 56px;
-  width: 100%;
-}
-
 .restaurants-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -56,14 +32,6 @@
   border-radius: 4px;
   margin: 20px 0;
 }
-
-.no-restaurants {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: #999;
-}
-
 
 .no-restaurants {
   text-align: center;

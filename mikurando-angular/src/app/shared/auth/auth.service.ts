@@ -226,23 +226,22 @@ export class AuthService {
     category?: string;
     maxDistance?: number;
   }): Observable<Restaurant[]> {
-    const url = `${this.apiBaseUrl}/restaurants`;
-    const params: any = {};
+    let url = `${this.apiBaseUrl}/restaurants`;
+    const params = new URLSearchParams();
 
-    if (filters?.name) params.name = filters.name;
-    if (filters?.area_code) params.area_code = filters.area_code;
-    if (filters?.category) params.category = filters.category;
-    if (filters?.maxDistance) params.maxDistance = filters.maxDistance.toString();
+    if (filters?.name) params.append('name', filters.name);
+    if (filters?.area_code) params.append('area_code', filters.area_code);
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.maxDistance) params.append('maxDistance', filters.maxDistance.toString());
 
-    return this.http.get<Restaurant[]>(url, { params });
+    const queryString = params.toString();
+    if (queryString) url += `?${queryString}`;
+
+    return this.http.get<Restaurant[]>(url);
   }
 
-  getRestaurantById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiBaseUrl}/restaurants/${id}`);
-  }
-
-  getRestaurantReviews(restaurantId: number): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiBaseUrl}/restaurants/${restaurantId}/reviews`);
+  getRestaurantById(id: number): Observable<Restaurant> {
+    return this.http.get<Restaurant>(`${this.apiBaseUrl}/restaurants/${id}`);
   }
 
   getOrdersByUserId(userId: number) {
@@ -287,28 +286,4 @@ export class AuthService {
       complete: () => console.log('Review-Prozess abgeschlossen')
     });
   }
-}
-
-export interface Review {
-  review_id: number;
-  restaurant_id: number;
-  user_name: string;
-  rating: number;
-  comment: string;
-  created_at: string;
-  dish_name?: string;
-}
-
-export interface Dish {
-  dish_id: number;
-  restaurant_id?: number;
-  dish_name: string;
-  name?: string;
-  description: string;
-  price: number;
-  category: string;
-  category_id?: number;
-  is_available: boolean;
-  available?: boolean;
-  image_data?: string;
 }

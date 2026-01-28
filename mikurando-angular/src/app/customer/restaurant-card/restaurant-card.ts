@@ -3,7 +3,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService, Restaurant } from '../../shared/auth/auth.service';
+import { Restaurant } from '../../shared/auth/auth.service';
 
 /**
  * @title Restaurant Card
@@ -34,8 +34,9 @@ export class RestaurantCardComponent {
       } else {
         this.restaurantImage = './assets/Tobi.jpg';
       }
-      // Load reviews and calculate rating
-      this.loadReviews(data.restaurant_id);
+      // Update rating display
+      this.ratingDisplay = this.getRatingValue(4.3);
+      this.ratingStars = this.getRatingStars(4.3);
       this.cdr.markForCheck();
     }
   }
@@ -45,10 +46,8 @@ export class RestaurantCardComponent {
 
   private _restaurant!: Restaurant;
   restaurantImage: string = './assets/Tobi.jpg';
-  ratingDisplay: string = '5.0';
-  ratingStars: string = '⭐⭐⭐⭐⭐';
-
-  private authService = inject(AuthService);
+  ratingDisplay: string = '4.5';
+  ratingStars: string = '⭐⭐⭐⭐';
 
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
@@ -64,31 +63,6 @@ export class RestaurantCardComponent {
     return result.replace(/^"|"$/g, '');
   }
 
-  private loadReviews(restaurantId: number): void {
-    this.authService.getRestaurantReviews(restaurantId).subscribe({
-      next: (reviews) => {
-        if (reviews && reviews.length > 0) {
-          // Berechne Durchschnitt
-          const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-          this.ratingDisplay = this.getRatingValue(averageRating);
-          this.ratingStars = this.getRatingStars(averageRating);
-        } else {
-          // Keine Reviews -> 5 Sterne Default
-          this.ratingDisplay = this.getRatingValue(5.0);
-          this.ratingStars = this.getRatingStars(5.0);
-        }
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error('Fehler beim Laden der Reviews:', err);
-        // Bei Fehler auch 5 Sterne Default
-        this.ratingDisplay = this.getRatingValue(5.0);
-        this.ratingStars = this.getRatingStars(5.0);
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
   getRatingStars(rating: number = 4.5): string {
     const roundedRating = Math.round(rating);
     let stars = '⭐'.repeat(roundedRating);
@@ -100,14 +74,6 @@ export class RestaurantCardComponent {
   }
 
   navigateToRestaurant() {
-    if (this._restaurant && this._restaurant.restaurant_id) {
-      // Pass restaurant data including the already converted image
-      this.router.navigate(['/restaurant', this._restaurant.restaurant_id], {
-        state: { 
-          restaurantData: this._restaurant,
-          restaurantImage: this.restaurantImage 
-        }
-      });
-    }
+    this.router.navigate(['/login']);
   }
 }

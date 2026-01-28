@@ -13,10 +13,6 @@ import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-c
 import { RestaurantList } from './customer/restaurant-list/restaurant-list';
 import { Feedback } from './customer/feedback/feedback';
 import { Tracking } from './customer/tracking/tracking';
-import { RestaurantSite } from './customer/restaurant-site/restaurant-site';
-import { CartSite } from './customer/cart-site/cart-site';
-import { Checkout } from './customer/checkout/checkout';
-import { DeliveryTracking } from './customer/delivery-tracking/delivery-tracking';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -85,6 +81,16 @@ export const routes: Routes = [
     path: 'owner/forum-moderation',
     canActivate: [authGuard],
     loadComponent: () => import('./owner/forum-moderation.page').then((m) => m.OwnerForumModerationPage),
+  },
+
+  {
+    path: 'customer/feedback',
+    component: Feedback
+  },
+
+  {
+    path: 'customer/tracking',
+    component: Tracking
   },
 
   { path: '**', redirectTo: '/notfound' },

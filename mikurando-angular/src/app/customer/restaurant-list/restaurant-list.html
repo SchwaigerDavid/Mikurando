@@ -1,55 +1,6 @@
 <div class="restaurants-container">
   <h1>Verfügbare Restaurants</h1>
   
-  <!-- Filter Section -->
-  <mat-card class="filter-section">
-    <mat-card-content>
-      <div class="filter-grid">
-        <mat-form-field class="filter-field">
-          <mat-label>Restaurant Name</mat-label>
-          <input 
-            matInput 
-            placeholder="Nach Name suchen..." 
-            [(ngModel)]="filterName"
-            (ngModelChange)="onFilterChange()">
-        </mat-form-field>
-
-        <mat-form-field class="filter-field">
-          <mat-label>Kategorie</mat-label>
-          <mat-select 
-            [(ngModel)]="filterCategory"
-            (ngModelChange)="onFilterChange()">
-            <mat-option value="">Alle Kategorien</mat-option>
-            <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field class="filter-field">
-          <mat-label>Postleitzahl</mat-label>
-          <input 
-            matInput
-            placeholder="z.B. 10115" 
-            [(ngModel)]="filterAreaCode"
-            (ngModelChange)="onFilterChange()">
-        </mat-form-field>
-
-        <mat-form-field class="filter-field">
-          <mat-label>Max. Entfernung (km)</mat-label>
-          <input 
-            matInput
-            type="number" 
-            placeholder="z.B. 5" 
-            [(ngModel)]="filterMaxDistance"
-            (ngModelChange)="onFilterChange()">
-        </mat-form-field>
-
-        <button mat-raised-button color="primary" (click)="resetFilters()" class="reset-button">
-          Filter zurücksetzen
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  
   <div *ngIf="isLoading()" class="loading">
     Restaurants werden geladen...
   </div>
