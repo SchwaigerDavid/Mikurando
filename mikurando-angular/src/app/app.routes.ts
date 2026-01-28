@@ -13,6 +13,10 @@ import { RestaurantCardComponent } from './customer/restaurant-card/restaurant-c
 import { RestaurantList } from './customer/restaurant-list/restaurant-list';
 import { Feedback } from './customer/feedback/feedback';
 import { Tracking } from './customer/tracking/tracking';
+import { RestaurantSite } from './customer/restaurant-site/restaurant-site';
+import { CartSite } from './customer/cart-site/cart-site';
+import { Checkout } from './customer/checkout/checkout';
+import { DeliveryTracking } from './customer/delivery-tracking/delivery-tracking';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -30,6 +34,22 @@ export const routes: Routes = [
    {
     path: 'restaurants',
     component: RestaurantList
+  },
+  {
+    path: 'restaurant/:id',
+    component: RestaurantSite
+  },
+  {
+    path: 'cart',
+    component: CartSite
+  },
+  {
+    path: 'checkout',
+    component: Checkout
+  },
+  {
+    path: 'delivery-tracking',
+    component: DeliveryTracking
   },
   {
     path: 'home',

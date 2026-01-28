@@ -1,0 +1,38 @@
+<div class="dish-card" [class.unavailable]="!isAvailable">
+  <div class="dish-image">
+    <img *ngIf="imageData" [src]="imageData" [alt]="dishName">
+    <div *ngIf="!imageData" class="no-image">Kein Bild</div>
+  </div>
+  
+  <div class="dish-content">
+    <h3 class="dish-name">{{ dishName }}</h3>
+    <p class="dish-description">{{ description }}</p>
+    <p class="dish-category">{{ category }}</p>
+  </div>
+  
+  <div class="dish-actions">
+    <!-- Show Plus button when NOT in cart -->
+    <button mat-mini-fab 
+            color="primary" 
+            *ngIf="!isInCart()"
+            (click)="onAddToCart()"
+            [disabled]="!isAvailable"
+            class="add-button"
+            type="button">
+      <mat-icon>add</mat-icon>
+    </button>
+    
+    <!-- Show quantity controls when IN cart -->
+    <div *ngIf="isInCart()" class="quantity-controls">
+      <button mat-icon-button (click)="decrement()" class="qty-button" type="button">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span class="quantity-display">{{ quantity() }}</span>
+      <button mat-icon-button (click)="increment()" class="qty-button" type="button">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+    
+    <p class="dish-price">{{ price | number:'1.2-2' }} €</p>
+  </div>
+</div>
