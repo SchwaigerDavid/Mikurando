@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MapComponent } from '../../components/map/map';
 import { debounceTime, Subject } from 'rxjs';
 
 @Component({
@@ -22,7 +23,8 @@ import { debounceTime, Subject } from 'rxjs';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    MapComponent
   ],
   templateUrl: './restaurant-list.html',
   styleUrl: './restaurant-list.scss',

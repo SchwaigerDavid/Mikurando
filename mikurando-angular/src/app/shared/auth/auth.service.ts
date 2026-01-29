@@ -100,7 +100,7 @@ export class AuthService {
   }
 
   private loadProfilePicture(userId: number): void {
-    this.http.get<any>(`${this.apiBaseUrl}/user/${userId}`).subscribe({
+    this.http.get<any>(`${this.apiBaseUrl}/user/profile`).subscribe({
       next: (response) => {
         if (response.data?.profile_picture_data) {
           localStorage.setItem('profile_picture_data', response.data.profile_picture_data);

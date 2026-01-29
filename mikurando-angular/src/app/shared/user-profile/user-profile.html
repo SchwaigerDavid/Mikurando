@@ -1,0 +1,83 @@
+<div class="profile-container">
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <div class="header-content">
+        <h1>Mein Profil</h1>
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading">
+        Benutzerdaten werden geladen...
+      </div>
+
+      <div *ngIf="!isLoading && !userData" class="error">
+        Fehler beim Laden der Benutzerdaten
+      </div>
+
+      <div *ngIf="!isLoading && userData" class="profile-content">
+        <div class="profile-field">
+          <label>Email</label>
+          <div *ngIf="!isEditing" class="field-value">{{ userData.email }}</div>
+          <mat-form-field *ngIf="isEditing">
+            <mat-label>Email</mat-label>
+            <input matInput [(ngModel)]="editData.email" type="email">
+          </mat-form-field>
+        </div>
+
+        <div class="profile-field">
+          <label>Vorname</label>
+          <div *ngIf="!isEditing" class="field-value">{{ userData.name || 'Nicht angegeben' }}</div>
+          <mat-form-field *ngIf="isEditing">
+            <mat-label>Vorname</mat-label>
+            <input matInput [(ngModel)]="editData.name" placeholder="Vorname">
+          </mat-form-field>
+        </div>
+
+        <div class="profile-field">
+          <label>Nachname</label>
+          <div *ngIf="!isEditing" class="field-value">{{ userData.surname || 'Nicht angegeben' }}</div>
+          <mat-form-field *ngIf="isEditing">
+            <mat-label>Nachname</mat-label>
+            <input matInput [(ngModel)]="editData.surname" placeholder="Nachname">
+          </mat-form-field>
+        </div>
+
+        <div class="profile-field">
+          <label>Adresse</label>
+          <div *ngIf="!isEditing" class="field-value">{{ userData.address || 'Nicht angegeben' }}</div>
+          <mat-form-field *ngIf="isEditing">
+            <mat-label>Adresse</mat-label>
+            <input matInput [(ngModel)]="editData.address" placeholder="Adresse">
+          </mat-form-field>
+        </div>
+
+        <div class="profile-field">
+          <label>Postleitzahl</label>
+          <div *ngIf="!isEditing" class="field-value">{{ userData.area_code || 'Nicht angegeben' }}</div>
+          <mat-form-field *ngIf="isEditing">
+            <mat-label>Postleitzahl</mat-label>
+            <input matInput [(ngModel)]="editData.area_code" placeholder="Postleitzahl">
+          </mat-form-field>
+        </div>
+
+        <div class="profile-actions">
+          <button *ngIf="!isEditing" mat-raised-button color="primary" (click)="toggleEdit()">
+            Profil bearbeiten
+          </button>
+          <div *ngIf="isEditing" class="edit-actions">
+            <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="isSaving">
+              {{ isSaving ? 'Wird gespeichert...' : 'Speichern' }}
+            </button>
+            <button mat-raised-button (click)="cancelEdit()" [disabled]="isSaving">
+              Abbrechen
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

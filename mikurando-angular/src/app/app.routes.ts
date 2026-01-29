@@ -19,6 +19,7 @@ import { Checkout } from './customer/checkout/checkout';
 import { DeliveryTracking } from './customer/delivery-tracking/delivery-tracking';
 import { OwnerDishes } from './owner/owner-dishes/owner-dishes';
 import { CreateDishComponent } from './owner/create-dish/create-dish';
+import { UserProfileComponent } from './shared/user-profile/user-profile';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -123,6 +124,12 @@ export const routes: Routes = [
   {
     path: 'customer/tracking',
     component: Tracking
+  },
+
+  {
+    path: 'profile',
+    component: UserProfileComponent,
+    canActivate: [authGuard]
   },
 
   { path: '**', redirectTo: '/notfound' },

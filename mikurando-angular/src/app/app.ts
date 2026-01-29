@@ -21,7 +21,7 @@ export class App {
 
 
   isLoggedIn = computed(() => this.auth.isLoggedIn());
-  userName = computed(() => this.auth.getemail());
+  userEmail = computed(() => this.auth.user()?.email || '');
   profilePicture = computed(() => this.auth.profilePicture());
   cartItemCount = computed(() => this.cartService.itemCount());
   // @ts-ignore
@@ -32,7 +32,7 @@ export class App {
      return "ownerdash";
    }
    else if(myUser.role=="CUSTOMER") {
-     return "home";
+     return "restaurants";
    }
    else if(myUser.role=="MANAGER"){
      return "home"
@@ -41,5 +41,9 @@ export class App {
   logout() {
     this.auth.logout();
     this.router.navigateByUrl('/login');
+  }
+
+  navigateToProfile() {
+    this.router.navigate(['/profile']);
   }
 }

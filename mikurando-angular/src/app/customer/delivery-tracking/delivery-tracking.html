@@ -51,7 +51,11 @@
       <mat-card-title>Live-Tracking</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <app-map [customerLocation]="customerCoordinates()" [showConnection]="hasActiveDelivery()"></app-map>
+      <app-map 
+        [customerLocation]="customerCoordinates()" 
+        [showConnection]="hasActiveDelivery()"
+        [restaurantData]="deliveryData()?.restaurant"
+      ></app-map>
     </mat-card-content>
   </mat-card>
   

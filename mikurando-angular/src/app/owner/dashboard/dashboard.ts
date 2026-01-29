@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
 import {GraphComponent} from "./graphs/graphs.component";
 import { TableComponent } from './order-tables/order-tables';
 import { AuthService } from '../../shared/auth/auth.service';
@@ -16,6 +18,7 @@ import { AuthService } from '../../shared/auth/auth.service';
     MatGridListModule,
     MatCardModule,
     MatButtonToggleModule,
+    MatButtonModule,
     GraphComponent,
     TableComponent
   ],
@@ -24,6 +27,7 @@ import { AuthService } from '../../shared/auth/auth.service';
 })
 export class DashboardOwner implements OnInit {
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   @Input() restaurantData: any; // Daten kommen vom Tab-Loop
   @Input() restaurantIndex: number = 0;
@@ -235,6 +239,10 @@ export class DashboardOwner implements OnInit {
     this.revenue = parseFloat(totalRevenue.toFixed(2)); // Auf 2 Nachkommastellen runden
 
     console.log(`Berechnung abgeschlossen: ${this.orderCount} Orders, ${this.revenue}€ Umsatz.`);
+  }
+
+  navigateToDishes() {
+    this.router.navigate(['/owner/dishes']);
   }
 
 }

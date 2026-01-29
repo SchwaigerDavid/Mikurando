@@ -12,6 +12,8 @@ import { MapDataService } from '../../shared/map-data-service';
 export class MapComponent implements AfterViewInit {
   @Input() customerLocation: { lat: number; lng: number } | null = null;
   @Input() showConnection: boolean = true;
+  @Input() restaurantId: number | null = null;
+  @Input() restaurantData: any = null;
   
   private map: any;
   private currentRadiusCircle: any = null;
@@ -37,7 +39,22 @@ export class MapComponent implements AfterViewInit {
         return;
       }
 
-      // get data
+      // Wenn restaurantData vorhanden ist (für Delivery Tracking), zeige nur dieses Restaurant
+      if (this.restaurantData && this.customerLocation) {
+        console.log('Delivery Tracking Modus - Zeige spezifisches Restaurant und Lieferadresse');
+        
+        const userLat = this.customerLocation.lat;
+        const userLng = this.customerLocation.lng;
+        
+        this.initMap(L, userLat, userLng);
+        this.addUserMarker(L, userLat, userLng, 'Lieferadresse');
+        this.addRestaurantMarker(L, this.restaurantData);
+        this.drawOSRMRoute(L, this.restaurantData.geo_lat, this.restaurantData.geo_lng, userLat, userLng);
+        
+        return;
+      }
+
+      // Normaler Modus: Zeige alle Restaurants
       this.mapService.getDataForMap().subscribe({
         next: (data: any) => {
           console.log('Daten empfangen:', data);
@@ -97,6 +114,38 @@ export class MapComponent implements AfterViewInit {
       .bindPopup(`<b>${name}</b><br>Lieferadresse`)
   }
 
+  private addRestaurantMarker(L: any, restaurant: any): void {
+    if (!restaurant.geo_lat || !restaurant.geo_lng) {
+      console.warn('Keine Koordinaten für Restaurant gefunden');
+      return;
+    }
+
+    const restIcon = L.icon({
+      iconUrl: 'assets/restaurant-marker.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
+    const marker = L.marker([restaurant.geo_lat, restaurant.geo_lng], { icon: restIcon })
+      .addTo(this.map);
+
+    const container = document.createElement('div');
+    container.className = 'popup-card';
+
+    const title = document.createElement('h3');
+    title.className = 'popup-card__title';
+    title.innerText = restaurant.restaurant_name;
+    container.appendChild(title);
+
+    const info = document.createElement('p');
+    info.className = 'popup-card__info';
+    info.innerText = restaurant.category;
+    container.appendChild(info);
+
+    marker.bindPopup(container);
+  }
+
   private addRestaurantMarkers(L: any, restaurants: any[]): void {
     const restIcon = L.icon({
       iconUrl: 'assets/restaurant-marker.png',
@@ -136,7 +185,7 @@ export class MapComponent implements AfterViewInit {
 
       btn.addEventListener('click', () => {
         this.zone.run(() => {
-          this.router.navigate(['/restaurants', r.restaurant_id]);
+          this.router.navigate(['/restaurant', r.restaurant_id]);
         });
       });
 
@@ -192,5 +241,45 @@ export class MapComponent implements AfterViewInit {
         ).addTo(this.map);
       }
     }
+  }
+
+  private drawOSRMRoute(L: any, restLat: number, restLng: number, userLat: number, userLng: number): void {
+    // Nutze OSRM (Open Source Routing Machine) für reale Route
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${restLng},${restLat};${userLng},${userLat}?geometries=geojson`;
+    
+    fetch(osrmUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          const coordinates = route.geometry.coordinates.map((coord: number[]) => [coord[1], coord[0]]);
+          
+          // Zeichne die Route auf der Map
+          const polyline = L.polyline(coordinates, {
+            color: '#FF6B6B',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '5, 5'
+          }).addTo(this.map);
+          
+          // Zoome auf die Route
+          this.map.fitBounds(polyline.getBounds());
+          
+          console.log(`OSRM Route gezeichnet - Entfernung: ${(route.distance / 1000).toFixed(2)} km, Dauer: ${(route.duration / 60).toFixed(0)} min`);
+        }
+      })
+      .catch((err) => {
+        console.error('Fehler beim Abrufen der OSRM Route:', err);
+        // Fallback: Zeichne gerade Linie
+        const polyline = L.polyline(
+          [[restLat, restLng], [userLat, userLng]],
+          {
+            color: '#FF6B6B',
+            weight: 4,
+            opacity: 0.8
+          }
+        ).addTo(this.map);
+        this.map.fitBounds(polyline.getBounds());
+      });
   }
 }

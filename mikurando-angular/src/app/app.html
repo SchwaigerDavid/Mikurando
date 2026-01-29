@@ -3,14 +3,14 @@
   <div class="links">
     <a [routerLink]= getHome() *ngIf="isLoggedIn()">Home</a>
     <a routerLink="/forum" *ngIf="isLoggedIn()">Forum</a>
-    <a routerLink="/admin" *ngIf="isLoggedIn()">Site-Manager</a>
-    <a routerLink="/map" *ngIf="isLoggedIn()">Map</a>
-   
     <img *ngIf="isLoggedIn() && profilePicture()" 
          [src]="profilePicture()" 
          alt="Profile" 
          class="profile-picture" />
-    <span class="user" *ngIf="isLoggedIn() && !profilePicture()">{{ userName() }}</span>
+    <button *ngIf="isLoggedIn() && !profilePicture()" class="profile-button" (click)="navigateToProfile()">
+      <mat-icon class="profile-icon">account_circle</mat-icon>
+      <span class="email-text">{{ userEmail() }}</span>
+    </button>
 
     <a routerLink="/login" *ngIf="!isLoggedIn()">Login</a>
     <button class="linkbtn" type="button" (click)="logout()" *ngIf="isLoggedIn()">Logout</button>
