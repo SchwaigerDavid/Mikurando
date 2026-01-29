@@ -80,6 +80,11 @@ const updateOrderStatus = async (orderId, newStatus) => {
     return result.rows[0];
 };
 
+const hasDeliveredOrder = async (userId, restaurantId) => {
+    const result = await db.query(queries.hasUserOrderedFromRestaurant, [userId, restaurantId]);
+    return result.rows.length > 0;
+};
+
 
 module.exports = {
     createNewOrder,
@@ -87,5 +92,6 @@ module.exports = {
     getOrderDetails,
     getOrdersByRestaurantId,
     getOrderStatus,
-    updateOrderStatus
+    updateOrderStatus,
+    hasDeliveredOrder
 };

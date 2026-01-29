@@ -1,5 +1,6 @@
 const restaurantModel = require('../models/restaurantModel');
 const userModel = require('../models/userModel');
+const orderModel = require('../models/orderModel');
 
 const {calculateDistance} = require('../utils/locationUtils')
 
@@ -72,7 +73,13 @@ exports.addRestaurantReview = async (req, res) => {
             }
         }
 
-        // TODO: check if user has ordered dish at the restaurant
+        const hasOrdered = await orderModel.hasDeliveredOrder(user_id, idInt);
+
+        if (!hasOrdered) {
+            return res.status(403).json({
+                error: 'You can only review restaurants, where you have already received an order from..'
+            });
+        }
 
         const currentTime = new Date()
 

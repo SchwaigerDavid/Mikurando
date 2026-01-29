@@ -122,6 +122,14 @@ const updateOrderStatus = `
     RETURNING order_id, status
 `;
 
+const hasUserOrderedFromRestaurant = `
+    SELECT 1 FROM "Order" 
+    WHERE user_id = $1 
+      AND restaurant_id = $2 
+      AND status = 'DELIVERED'
+    LIMIT 1
+`;
+
 module.exports = {
     createNewOrder,
     addOrderItems,
@@ -130,6 +138,7 @@ module.exports = {
     getOrderDetailsById,
     getOrdersByRestaurantId,
     getOrderStatus,
-    updateOrderStatus
+    updateOrderStatus,
+    hasUserOrderedFromRestaurant
 }
 
