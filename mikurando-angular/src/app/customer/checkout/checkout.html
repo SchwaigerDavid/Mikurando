@@ -14,10 +14,15 @@
     </mat-card-content>
   </mat-card>
   
+  <!-- Delivery Address Toggle -->
+  <mat-checkbox [(ngModel)]="useDeliveryForm" class="delivery-toggle">
+    Rechnungsadresse verwenden
+  </mat-checkbox>
+  
   <!-- Delivery Address -->
-  <mat-card class="delivery-card">
+  <mat-card class="delivery-card" *ngIf="useDeliveryForm">
     <mat-card-header>
-      <mat-card-title>Lieferadresse</mat-card-title>
+      <mat-card-title>Rechnungsadresse</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="deliveryForm" class="delivery-form">

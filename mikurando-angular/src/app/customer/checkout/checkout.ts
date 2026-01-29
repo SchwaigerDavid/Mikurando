@@ -1,6 +1,6 @@
 import { Component, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CartService } from '../../shared/services/cart.service';
 
 @Component({
@@ -16,12 +17,14 @@ import { CartService } from '../../shared/services/cart.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCheckboxModule
   ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.scss',
@@ -34,6 +37,7 @@ export class Checkout {
   
   deliveryForm: FormGroup;
   isProcessing = false;
+  useDeliveryForm = false;
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     this.deliveryForm = this.fb.group({
@@ -47,17 +51,21 @@ export class Checkout {
   }
   
   processOrder() {
-    if (this.deliveryForm.invalid) {
+    if (this.useDeliveryForm && this.deliveryForm.invalid) {
       alert('Bitte füllen Sie alle Lieferadressfelder aus.');
       return;
     }
     
     this.isProcessing = true;
     
-    // Geocodiere die Lieferadresse um geo_lat und geo_lng zu bekommen
-    this.geocodeAddress(this.deliveryForm.value).then(coordinates => {
+    // Geocodiere die Lieferadresse um geo_lat und geo_lng zu bekommen (oder verwende Default-Koordinaten)
+    const geocodePromise = this.useDeliveryForm 
+      ? this.geocodeAddress(this.deliveryForm.value)
+      : Promise.resolve({ lat: 48.2082, lng: 16.3738 }); // Default: Wien
+    
+    geocodePromise.then(coordinates => {
       const orderData = {
-        delivery: this.deliveryForm.value,
+        delivery: this.useDeliveryForm ? this.deliveryForm.value : null,
         items: this.cartService.items(),
         total: this.cartService.totalPrice(),
         timestamp: new Date().toISOString(),
@@ -73,7 +81,9 @@ export class Checkout {
       const cartItems = this.cartService.items();
       const restaurantId = cartItems.length > 0 ? cartItems[0].restaurant_id : 0;
       
-      const deliveryAddressString = `${this.deliveryForm.value.street}, ${this.deliveryForm.value.postalCode} ${this.deliveryForm.value.city}`;
+      const deliveryAddressString = this.useDeliveryForm 
+        ? `${this.deliveryForm.value.street}, ${this.deliveryForm.value.postalCode} ${this.deliveryForm.value.city}`
+        : 'Abholung';
       
       const orderPayload = {
         restaurant_id: restaurantId,
