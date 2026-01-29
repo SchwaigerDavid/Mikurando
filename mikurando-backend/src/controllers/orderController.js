@@ -3,7 +3,7 @@ const userModel = require("../models/userModel");
 const restaurantModel = require("../models/restaurantModel");
 const voucherModel = require("../models/voucherModel");
 
-const { calculateDistance, estimateDeliveryTime } = require('../utils/locationUtils');
+const { calculateDistance, calculateDeliveryTime } = require('../utils/locationUtils');
 const { checkRestaurantOpenStatus } = require("../utils/timeUtils");
 
 exports.createOrder = async (req, res) => {
@@ -123,9 +123,24 @@ exports.createOrder = async (req, res) => {
         let total_price = subtotal + service_fee - discount;
         if (total_price < 0) total_price = 0;
 
-        // TODO: calculate estimated_delivery_time, use map api
-        const deliveryTimeMinutes = 15 + (distanceKm * 10);
-        const estimated_delivery_time = new Date(Date.now() + deliveryTimeMinutes * 60000);
+        // Calculate estimated_delivery_time, use map api
+        const preparation_time = 15; // 15 min prep Time
+
+        // API -> call
+        let travel_time = await getTravelTime(
+            userLat, userLng,
+            parseFloat(restaurant.geo_lat), parseFloat(restaurant.geo_lng)
+        );
+
+        // API says impossible, we say, we run
+        if (!travel_time) {
+            console.log('No route found, we will run in a straight line for our customers');
+            const speed = 10; // -> km/h
+            travel_time = Math.ceil((distanceKm / speed) * 60);
+        }
+
+        const totalMinutes = preparation_time + travel_time;
+        const estimated_delivery_time = new Date(Date.now() + totalMinutes * 60000);
 
 
 
