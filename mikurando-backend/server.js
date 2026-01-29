@@ -38,6 +38,5 @@ app.use('/forum', forumRoutes);
 const PORT = process.env.PORT;
 
 app.listen(PORT, async () => { // Start Server :)
-    console.log(`✅ Server Running on Port ${PORT}`);
-    console.log(`📝 Logging aktiviert - Console.logs sollten hier sichtbar sein`);
+    console.log(`Server Running on Port ${PORT}`);
 });
